@@ -1,4 +1,4 @@
-/**
+/*
  * SimMetrics - SimMetrics is a java library of Similarity or Distance
  * Metrics, e.g. Levenshtein Distance, that provide float based similarity
  * measures between String Data. All metrics return consistant measures
@@ -42,62 +42,53 @@ package uk.ac.shef.wit.simmetrics.tokenisers;
 import uk.ac.shef.wit.simmetrics.wordhandlers.InterfaceTermHandler;
 
 import java.util.Set;
-import java.util.Vector;
 import java.util.ArrayList;
 
 /**
- * Package: uk.ac.shef.wit.simmetrics.api
- * Description: InterfaceTokeniser interface for a Tokeniser class.
- * Date: 31-Mar-2004
- * Time: 15:09:09
- *
- * @author Sam Chapman <a href="http://www.dcs.shef.ac.uk/~sam/">Website</a>, <a href="mailto:sam@dcs.shef.ac.uk">Email</a>.
+ * 
+ * @author Sam Chapman
  * @version 1.1
  */
 public interface InterfaceTokeniser {
 
-    /**
-     * displays the tokenisation method.
-     *
-     * @return short description string
-     */
-    public String getShortDescriptionString();
+	/**
+	 * Displays the tokenisation method.
+	 *
+	 * @return short description string
+	 */
+	@Deprecated
+	public String getShortDescriptionString();
 
-    /**
-     * displays the delimitors used - (if applicable).
-     *
-     * @return string for the delimitors used - (if applicable) "" otherwise
-     */
-    public String getDelimiters();
+	/**
+	 * Gets the stop word handler used.
+	 * 
+	 * @return the stop word handler used
+	 */
+	public InterfaceTermHandler getStopWordHandler();
 
-    /**
-     * gets the stop word handler used.
-     * @return the stop word handler used
-     */
-    public InterfaceTermHandler getStopWordHandler();
+	/**
+	 * Sets the stop word handler used with the handler given.
+	 * 
+	 * @param stopWordHandler
+	 *            the given stop word hanlder
+	 */
+	public void setStopWordHandler(InterfaceTermHandler stopWordHandler);
 
-    /**
-     * sets the stop word handler used with the handler given.
-     * @param stopWordHandler the given stop word hanlder
-     */
-    public void setStopWordHandler(InterfaceTermHandler stopWordHandler);
+	/**
+	 * Return tokenized version of a string as an ArrayList.
+	 *
+	 * @param input
+	 *
+	 * @return ArrayList tokenized version of a string
+	 */
+	public ArrayList<String> tokenizeToArrayList(String input);
 
-    /**
-     * Return tokenized version of a string as an ArrayList.
-     *
-     * @param input
-     *
-     * @return ArrayList tokenized version of a string
-     */
-    public ArrayList<String> tokenizeToArrayList(String input);
-
-    /**
-     * Return tokenized version of a string as a set.
-     *
-     * @param input
-     *
-     * @return tokenized version of a string as a set
-     */
-    public Set<String> tokenizeToSet(String input);
+	/**
+	 * Return tokenized version of a string as a set.
+	 *
+	 * @param input
+	 *
+	 * @return tokenized version of a string as a set
+	 */
+	public Set<String> tokenizeToSet(String input);
 }
-
