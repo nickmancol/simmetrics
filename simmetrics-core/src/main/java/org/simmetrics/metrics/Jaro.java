@@ -11,111 +11,131 @@
  * License as published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  * 
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
  * 
  * You should have received a copy of the GNU General Public License along with
  * SimMetrics. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.simmetrics.metrics;
 
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+
 import org.simmetrics.StringMetric;
 
-
 /**
- * Implements the Jaro algorithm providing a similarity measure between two
- * strings allowing character transpositions to a degree.
+ * Jaro algorithm providing a similarity measure between two strings.
+ * 
+ * <p>
+ * This class is immutable and thread-safe.
+ * 
+ * @see <a
+ *      href="http://en.wikipedia.org/wiki/Jaro%E2%80%93Winkler_distance">Wikipedia
+ *      - Jaro-Winkler distance</a>
+ * @see JaroWinkler
  *
- * @author Sam Chapman
- * @version 1.1
+ *
+ *
  */
-public  class Jaro implements StringMetric {
-
+public class Jaro implements StringMetric {
 
 	@Override
-	public float compare(final String string1, final String string2) {
-		
-		if (string1.isEmpty() && string2.isEmpty()) {
+	public float compare(final String a, final String b) {
+
+		if (a.isEmpty() && b.isEmpty()) {
 			return 1.0f;
 		}
-		
-		if (string1.isEmpty() || string2.isEmpty()) {
-			return 0.0f;
-		}
-		
-		
-		// get half the length of the string rounded up - (this is the distance
-		// used for acceptable transpositions)
-		final int halflen = ((Math.min(string1.length(), string2.length())) / 2)
-				+ ((Math.min(string1.length(), string2.length())) % 2);
 
-		// get common characters
-		final StringBuffer common1 = getCommonCharacters(string1, string2,
-				halflen);
-		final StringBuffer common2 = getCommonCharacters(string2, string1,
-				halflen);
-
-		// check for zero in common
-		if (common1.length() == 0 || common2.length() == 0) {
+		if (a.isEmpty() || b.isEmpty()) {
 			return 0.0f;
 		}
 
-		// check for same length common strings returning 0.0f is not the same
-		if (common1.length() != common2.length()) {
+		// Intentional integer division to round down.
+		final int halfLength = max(0, max(a.length(), b.length()) / 2 - 1);
+
+		// Second argument of getCommonCharacters is modified. So we can reuse
+		// the first argument.
+		final char[] charsA = a.toCharArray();
+		final char[] commonA = getCommonCharacters(charsA, b.toCharArray(),
+				halfLength);
+		final char[] commonB = getCommonCharacters(b.toCharArray(), charsA,
+				halfLength);
+
+		if (commonA.length == 0 || commonB.length == 0) {
 			return 0.0f;
 		}
 
-		// get the number of transpositions
-		int transpositions = 0;
-		for (int i = 0; i < common1.length(); i++) {
-			if (common1.charAt(i) != common2.charAt(i))
+		// commonA and commonB will always contain the same multi-set of
+		// characters. Because getCommonCharacters has been optimized, commonA
+		// and commonB are zero-padded. So in this loop we count transposition 
+		// and use commonCharacters to determine the length of the multi-set.
+		float transpositions = 0;
+		int commonCharacters = 0;
+		for (int length = commonA.length; commonCharacters < length
+				&& commonA[commonCharacters] > 0; commonCharacters++) {
+			if (commonA[commonCharacters] != commonB[commonCharacters]) {
 				transpositions++;
-		}
-		transpositions /= 2.0f;
-
-		// calculate jaro metric
-		return (common1.length() / ((float) string1.length())
-				+ common2.length() / ((float) string2.length()) + (common1
-				.length() - transpositions) / ((float) common1.length())) / 3.0f;
-	}
-
-	/**
-	 * returns a string buffer of characters from string1 within string2 if they
-	 * are of a given distance seperation from the position in string1.
-	 *
-	 * @param string1
-	 * @param string2
-	 * @param distanceSep
-	 * @return a string buffer of characters from string1 within string2 if they
-	 *         are of a given distance seperation from the position in string1
-	 */
-	private static StringBuffer getCommonCharacters(final String string1,
-			final String string2, final int distanceSep) {
-		// create a return buffer of characters
-		final StringBuffer returnCommons = new StringBuffer();
-		// create a copy of string2 for processing
-		final StringBuffer copy = new StringBuffer(string2);
-		// iterate over string1
-		for (int i = 0; i < string1.length(); i++) {
-			final char ch = string1.charAt(i);
-			// set boolean for quick loop exit if found
-			boolean foundIt = false;
-			// compare char with range of characters to either side
-			for (int j = Math.max(0, i - distanceSep); !foundIt
-					&& j < Math.min(i + distanceSep, string2.length() - 1); j++) {
-				// check if found
-				if (copy.charAt(j) == ch) {
-					foundIt = true;
-					// append character found
-					returnCommons.append(ch);
-					// alter copied string2 for processing
-					copy.setCharAt(j, (char) 0);
-				}
 			}
 		}
-		return returnCommons;
+		float aCommonRatio = commonCharacters / (float) a.length();
+		float bCommonRatio = commonCharacters / (float) b.length();
+		float transpositionRatio = (commonCharacters - transpositions / 2.0f)
+				/ commonCharacters;
+
+		return (aCommonRatio + bCommonRatio + transpositionRatio) / 3.0f;
 	}
+
+	/*
+	 * Returns an array of characters from a within b. A character in b is
+	 * counted as common when it is within separation distance from the position
+	 * in a.
+	 */
+	private static char[] getCommonCharacters(final char[] charsA,
+			final char[] charsB, final int separation) {
+		final char[] common = new char[min(charsA.length, charsB.length)];
+
+		// Iterate of string a and find all characters that occur in b within
+		// the separation distance. Zero out any matches found to avoid
+		// duplicate matchings.
+		int commonIndex = 0;
+		for (int i = 0, length = charsA.length; i < length; i++) {
+			final char character = charsA[i];
+
+			int index = indexOf(character, charsB, i - separation, i + separation + 1);
+			if (index > -1) {
+				common[commonIndex++] = character;
+				charsB[index] = (char) 0;
+			}
+		}
+
+		// Both invocations will yield the same multi-set with the same amount
+		// of zero-padding, so they can be compared for transposition without
+		// making a copy.
+		return common;
+	}
+
+	/*
+	 * Search for character in buffer starting at fromIndex to toIndex - 1.
+	 * 
+	 * Returns -1 when not found.
+	 */
+	private static int indexOf(char character, char[] buffer, int fromIndex,
+			int toIndex) {
+
+		// compare char with range of characters to either side
+		for (int j = max(0, fromIndex), length = min(toIndex, buffer.length); j < length; j++) {
+			// check if found
+			if (buffer[j] == character) {
+				return j;
+			}
+		}
+
+		return -1;
+	}
+
 	@Override
 	public String toString() {
 		return "Jaro";

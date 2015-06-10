@@ -23,6 +23,7 @@ package org.simmetrics.metrics;
 import org.simmetrics.StringMetric;
 import org.simmetrics.metrics.NeedlemanWunch;
 
+
 public class NeedlemanWunchTest extends StringMetricTest {
 
 	@Override

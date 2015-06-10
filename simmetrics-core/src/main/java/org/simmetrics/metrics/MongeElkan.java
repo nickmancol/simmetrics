@@ -11,14 +11,18 @@
  * License as published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  * 
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
  * 
  * You should have received a copy of the GNU General Public License along with
  * SimMetrics. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.simmetrics.metrics;
+
+import static java.lang.Math.max;
+import static java.lang.Math.sqrt;
 
 import java.util.List;
 
@@ -26,11 +30,21 @@ import org.simmetrics.StringMetric;
 import org.simmetrics.ListMetric;
 
 /**
- * Implements the Monge Elkan algorithm providing an matching style similarity
- * measure between two strings.
+ * Monge Elkan algorithm providing an matching style similarity measure between
+ * two strings.
+ * <p>
+ * <code>similarity(a,b) = average( for s in a | max( for q in b | metric(s,q)) </code>
+ * </p>
+ * Implementation note: Because the matches of a in b are not symmetric with the
+ * matches of b in a and because the whole operation is not symmetric when a and
+ * b have a different length the asymmetry is normalized by *
+ * <p>
+ * This class is immutable and thread-safe.
+ * <p>
+ * <code>normalized_similarity(a,b) = sqrt(similarity(a,b) * similarity(b,a))</code>
+ * </p>
  * 
- * @author Sam Chapman
- * @version 1.1
+ * 
  */
 public class MongeElkan implements ListMetric<String> {
 
@@ -52,24 +66,28 @@ public class MongeElkan implements ListMetric<String> {
 		if (a.isEmpty() && b.isEmpty()) {
 			return 1.0f;
 		}
-		
+
 		if (a.isEmpty() || b.isEmpty()) {
 			return 0.0f;
 		}
-		
-		float sumMatches = 0.0f;
-		float maxFound;
-		for (String str1Token : a) {
-			maxFound = 0.0f;
-			for (String str2Token : b) {
-				final float found = metric.compare(str1Token, str2Token);
-				if (found > maxFound) {
-					maxFound = found;
-				}
+
+		// calculates normalized_similarity(a,b)
+		return (float) sqrt(similarity(a, b) * similarity(b, a));
+	}
+
+	private float similarity(List<String> a, List<String> b) {
+		// calculates average( for s in a | max( for q in b | metric(s,q))
+
+		float sum = 0.0f;
+
+		for (String s : a) {
+			float max = 0.0f;
+			for (String q : b) {
+				max = max(max, metric.compare(s, q));
 			}
-			sumMatches += maxFound;
+			sum += max;
 		}
-		return sumMatches / a.size();
+		return sum / a.size();
 	}
 
 	@Override

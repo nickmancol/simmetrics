@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.simmetrics.StringMetricBuilder;
 import org.simmetrics.tokenizers.Tokenizer;
 
 import com.google.common.base.Joiner;
@@ -14,10 +15,10 @@ import com.google.common.base.Predicate;
 
 /**
  * Tokenizer that filters tokens that don't match a predicate.
+ * <p>
+ * This class is immutable and thread-safe if its components are.
  * 
- * 
- * @author M.P. Korstanje
- *
+ * @see StringMetricBuilder
  */
 public final class FilteringTokenizer implements Tokenizer {
 

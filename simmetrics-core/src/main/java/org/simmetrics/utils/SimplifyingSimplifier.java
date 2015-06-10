@@ -22,12 +22,15 @@
 
 package org.simmetrics.utils;
 
+import org.simmetrics.StringMetricBuilder;
 import org.simmetrics.simplifiers.Simplifier;
 
 /**
  * A simplifier that delegates the work to another simplifier.
  * 
- * @author M.P. Korstanje
+ * @see StringMetricBuilder
+ * 
+ * 
  *
  */
 public interface SimplifyingSimplifier extends Simplifier, Simplifying {

@@ -11,24 +11,27 @@
  * License as published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  * 
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
  * 
  * You should have received a copy of the GNU General Public License along with
  * SimMetrics. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.simmetrics.metrics;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.simmetrics.ListMetric;
 
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Multiset;
+
 /**
- * Measures the similarity between two lists. Idea taken from <a
- * href="http://www.catalysoft.com/articles/StrikeAMatch.html">How to Strike a
- * Match</a>.
+ * Simon White algorithm providing a similarity measure between two lists. Idea
+ * taken from <a href="http://www.catalysoft.com/articles/StrikeAMatch.html">How
+ * to Strike a Match</a> by Simon White.
  * 
  * <p>
  * <code>
@@ -48,11 +51,12 @@ import org.simmetrics.ListMetric;
  * duplicates from scoring a perfect match against a list with single elements.
  * E.g. 'GGGGG' should not be identical to 'GG'.
  * 
- * 
+ * <p>
+ * This class is immutable and thread-safe.
  * 
  * @see DiceSimilarity
  * 
- * @author mpkorstanje
+ * 
  * @param <T>
  *            type of the token
  * 
@@ -65,14 +69,13 @@ public class SimonWhite<T> implements ListMetric<T> {
 		if (a.isEmpty() && b.isEmpty()) {
 			return 1.0f;
 		}
-		
+
 		if (a.isEmpty() || b.isEmpty()) {
 			return 0.0f;
 		}
 
 		// Copy for destructive list difference
-		b = new ArrayList<>(b);
-		int union = a.size() + b.size();
+		Multiset<T> bCopy = HashMultiset.create(b);
 
 		// Count elements in the list intersection.
 		// Elements are counted only once in both lists.
@@ -80,12 +83,12 @@ public class SimonWhite<T> implements ListMetric<T> {
 		// Note: this is not the same as b.retainAll(a).size()
 		int intersection = 0;
 		for (T token : a) {
-			if (b.remove(token)) {
+			if (bCopy.remove(token)) {
 				intersection++;
 			}
 		}
 
-		return 2.0f * intersection / union;
+		return 2.0f * intersection / (a.size() + b.size());
 
 	}
 
