@@ -21,6 +21,7 @@
  */
 package org.simmetrics.metrics;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.Math.max;
 import static java.lang.Math.sqrt;
 
@@ -37,13 +38,12 @@ import org.simmetrics.ListMetric;
  * </p>
  * Implementation note: Because the matches of a in b are not symmetric with the
  * matches of b in a and because the whole operation is not symmetric when a and
- * b have a different length the asymmetry is normalized by *
- * <p>
- * This class is immutable and thread-safe.
+ * b have a different length the asymmetry is normalized by:
  * <p>
  * <code>normalized_similarity(a,b) = sqrt(similarity(a,b) * similarity(b,a))</code>
  * </p>
- * 
+ * <p>
+ * This class is immutable and thread-safe.
  * 
  */
 public class MongeElkan implements ListMetric<String> {
@@ -62,7 +62,9 @@ public class MongeElkan implements ListMetric<String> {
 
 	@Override
 	public float compare(List<String> a, List<String> b) {
-
+		checkArgument(!a.contains(null),"a may not not contain null");
+		checkArgument(!b.contains(null),"b may not not contain null");
+		
 		if (a.isEmpty() && b.isEmpty()) {
 			return 1.0f;
 		}
@@ -76,8 +78,7 @@ public class MongeElkan implements ListMetric<String> {
 	}
 
 	private float similarity(List<String> a, List<String> b) {
-		// calculates average( for s in a | max( for q in b | metric(s,q))
-
+		// calculates average( for s in a | max( for q in b | metric(s,q))		
 		float sum = 0.0f;
 
 		for (String s : a) {

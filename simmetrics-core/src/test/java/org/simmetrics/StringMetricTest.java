@@ -19,33 +19,44 @@
  * You should have received a copy of the GNU General Public License along with
  * SimMetrics. If not, see <http://www.gnu.org/licenses/>.
  */
+package org.simmetrics;
 
-package org.simmetrics.utils;
+@SuppressWarnings("javadoc")
+public abstract class StringMetricTest extends MetricTest<String> {
 
-import org.simmetrics.simplifiers.Simplifier;
+	protected static final class T {
+		protected final float similarity;
+		protected final String string1;
+		protected final String string2;
 
-/**
- * Simplifier that does not modify a given string.
- * 
- * <p>
- * This class is immutable and thread-safe.
- */
-public final class PassThroughSimplifier implements Simplifier {
-
-	@Override
-	public String simplify(String input) {
-		// Throw null pointer exception to remain consistent with other
-		// simplifiers.
-		if (input == null) {
-			throw new NullPointerException();
+		public T(float similarity, String string1, String string2) {
+			this.string1 = string1;
+			this.string2 = string2;
+			this.similarity = similarity;
 		}
 
-		return input;
+	}
+
+	private static MetricTest.T<String>[] transformTest(T... tests) {
+		@SuppressWarnings("unchecked")
+		MetricTest.T<String>[] transformed = new MetricTest.T[tests.length];
+		for (int i = 0; i < tests.length; i++) {
+			T t = tests[i];
+			transformed[i] = new MetricTest.T<>(t.similarity,t.string1,t.string2);
+		}
+		return transformed;
 	}
 
 	@Override
-	public String toString() {
-		return "[]";
+	protected final MetricTest.T<String>[] getTests() {
+		return transformTest(getStringTests());
+	}
+
+	protected abstract T[] getStringTests();
+
+	@Override
+	protected final String getEmpty() {
+		return "";
 	}
 
 }

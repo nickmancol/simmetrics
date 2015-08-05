@@ -30,8 +30,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
-import static org.simmetrics.utils.Math.max3;
-import static org.simmetrics.utils.Math.max4;
+import static org.simmetrics.utils.Math.max;
 
 /**
  * Smith-Waterman algorithm providing a similarity measure between two strings.
@@ -97,24 +96,18 @@ public class SmithWatermanGotoh implements StringMetric {
 
 		float maxDistance = min(a.length(), b.length())
 				* max(substitution.max(), gapValue);
-		return smithWaterman(a, b) / maxDistance;
+		return smithWatermanGotoh(a, b) / maxDistance;
 	}
 
-	private float smithWaterman(final String s, final String t) {
-		if (s.isEmpty()) {
-			return t.length();
-		}
-		if (t.isEmpty()) {
-			return s.length();
-		}
-
+	private float smithWatermanGotoh(final String s, final String t) {
+		
 		float[] v0 = new float[t.length()];
 		float[] v1 = new float[t.length()];
 
-		float max = v0[0] = max3(0, gapValue, substitution.compare(s, 0, t, 0));
+		float max = v0[0] = max(0, gapValue, substitution.compare(s, 0, t, 0));
 
 		for (int j = 1; j < v0.length; j++) {
-			v0[j] = max3(0, v0[j - 1] + gapValue,
+			v0[j] = max(0, v0[j - 1] + gapValue,
 					substitution.compare(s, 0, t, j));
 
 			max = max(max, v0[j]);
@@ -122,12 +115,12 @@ public class SmithWatermanGotoh implements StringMetric {
 
 		// Find max
 		for (int i = 1; i < s.length(); i++) {
-			v1[0] = max3(0, v0[0] + gapValue, substitution.compare(s, i, t, 0));
+			v1[0] = max(0, v0[0] + gapValue, substitution.compare(s, i, t, 0));
 
 			max = max(max, v1[0]);
 
 			for (int j = 1; j < v0.length; j++) {
-				v1[j] = max4(0, v0[j] + gapValue, v1[j - 1] + gapValue,
+				v1[j] = max(0, v0[j] + gapValue, v1[j - 1] + gapValue,
 						v0[j - 1] + substitution.compare(s, i, t, j));
 
 				max = max(max, v1[j]);
@@ -143,7 +136,7 @@ public class SmithWatermanGotoh implements StringMetric {
 
 	@Override
 	public String toString() {
-		return "SmithWaterman [substitution=" + substitution + ", gapValue="
+		return "SmithWatermanGotoh [substitution=" + substitution + ", gapValue="
 				+ gapValue + "]";
 	}
 }

@@ -3,21 +3,14 @@
 	<parent>
 		<groupId>com.github.mpkorstanje</groupId>
 		<artifactId>simmetrics</artifactId>
-		<version>3.0.3</version>
+		<version>3.2.0</version>
 	</parent>
 
 	<artifactId>simmetrics-core</artifactId>
 	<name>Core</name>
 	<packaging>jar</packaging>
 
-
 	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.8.1</version>
-			<scope>test</scope>
-		</dependency>
 
 		<dependency>
 			<groupId>com.google.guava</groupId>
@@ -35,6 +28,13 @@
 			<groupId>com.google.caliper</groupId>
 			<artifactId>caliper</artifactId>
 			<version>1.0-beta-2</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.10</version>
 			<scope>test</scope>
 		</dependency>
 

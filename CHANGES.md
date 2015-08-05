@@ -1,6 +1,27 @@
 Change Log
 ==========
 
+## Since 3.2.0 ##
+
+ - Better handling of null elements in ListDistance and ListMetric
+ - Added transformation step for tokens in StringMetricBuilder
+ - Added efficient chaining of tokenizers, simplifiers, filters and transforms
+ - Fixed bug where builder would allow incorrect initial step
+
+## Since 3.1.0 ##
+ - Added Block distance
+ - Added Hamming distance
+ - Added Damerau-Levenshtein
+ - Added weights to Levensthein
+ - Minor optimization for Levensthein
+ - Fixed bug where Levensthein would return incorrect similarity one argument was empty
+ - Fixed bug where NeedlemanWunch would return incorrect similarity one argument was empty
+ - SmithWaterman.toString and SmithWatermanGotoh.toString now return correct values
+ - Jaro now returns correct similarity for strings containing \0
+
+## Since 3.0.4 ##
+  - Fixed bug where Jaro would produce NaN similarity when neither string had any characters in common.
+
 ## Since 3.0.3 ##
   - Clarified java doc w/ regards to reflexive reflexive properties
   - Clarified java doc w/ regards to NullPointerExceptions

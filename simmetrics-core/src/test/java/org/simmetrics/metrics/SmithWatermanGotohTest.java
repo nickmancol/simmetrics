@@ -22,19 +22,34 @@
 package org.simmetrics.metrics;
 
 import org.simmetrics.StringMetric;
+import org.simmetrics.StringMetricTest;
 import org.simmetrics.metrics.SmithWatermanGotoh;
 
-public class SmithWatermanGotohTest extends StringMetricTest {
+@SuppressWarnings("javadoc")
+public final class SmithWatermanGotohTest extends StringMetricTest {
+	
+	@Override
+	protected boolean satisfiesSubadditivity() {
+		return false;
+	}
+	
+	@Override
+	protected boolean satisfiesCoincidence() {
+		return false;
+	}
 
 	@Override
 	protected StringMetric getMetric() {
 		return new SmithWatermanGotoh();
 	}
 
+	
 	@Override
-	protected T[] getTests() {
+	protected T[] getStringTests()  {
 		return new T[] {
 				new T(0.9167f, "test string1", "test string2"),
+				new T(1.0000f, "test", "test string2"),
+				new T(0.0000f, "", "test string2"),
 				new T(0.8000f, "aaa bbb ccc ddd", "aaa bbb ccc eee"),
 				new T(0.8571f, "a b c d", "a b c e"),
 				new T(0.8333f, "Healed", "Sealed"),

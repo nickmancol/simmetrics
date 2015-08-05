@@ -19,46 +19,28 @@
  * You should have received a copy of the GNU General Public License along with
  * SimMetrics. If not, see <http://www.gnu.org/licenses/>.
  */
+package org.simmetrics.metrics.costfunctions;
 
-package org.simmetrics.utils;
+import org.simmetrics.metrics.functions.MatchMismatch;
+import org.simmetrics.metrics.functions.Substitution;
 
-import static com.google.common.base.Joiner.on;
-
-import org.simmetrics.simplifiers.Simplifier;
-
-/**
- * Simplifier composed of multiple simplifiers. Applies the simplifiers in their
- * iteration order.
- * <p>
- * This class is immutable and thread-safe if its components are.
- */
-public class CompositeSimplifier implements Simplifier {
-
-	private final Iterable<Simplifier> simplifiers;
-
-	/**
-	 * Constructs a new composite simplifier.
-	 * 
-	 * @param simplifiers
-	 *            an iteration of simplifiers
-	 */
-	public CompositeSimplifier(Iterable<Simplifier> simplifiers) {
-		this.simplifiers = simplifiers;
+@SuppressWarnings("javadoc")
+public class MatchMismatchTest extends SubstitutionTest {
+	
+	@Override
+	public Substitution getCost() {
+		return new MatchMismatch(1.0f, -0.25f);
 	}
 
 	@Override
-	public String simplify(String input) {
-		for (Simplifier s : simplifiers) {
-			input = s.simplify(input);
-		}
-
-		return input;
-
-	}
-
-	@Override
-	public String toString() {
-		return on(" -> ").join(simplifiers);
+	public T[] getTests() {
+		return new T[]{
+				new T(1.000f, "a", 0, "a", 0),
+				new T(-0.25f, "a", 0, "b", 0),
+				new T(1.000f, "ab", 0, "ba", 1),
+				new T(-0.25f, "ab", 1, "ba", 1),
+				
+		};
 	}
 
 }

@@ -23,9 +23,11 @@ package org.simmetrics.metrics.costfunctions;
 import static org.junit.Assert.*;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.simmetrics.metrics.functions.Gap;
 
+@SuppressWarnings("javadoc")
 public abstract class GapCostTest {
 
 	protected static class T {
@@ -63,7 +65,7 @@ public abstract class GapCostTest {
 	}
 
 	@Test
-	public void testGetSimilarity() {
+	public void value() {
 		for (T t : getTests()) {
 
 			float actuall = cost.value(t.index1, t.index2);
@@ -81,6 +83,8 @@ public abstract class GapCostTest {
 	}
 
 	
+	@Test
+	@Ignore
 	public void generateTest() {
 		for (T t : getTests()) {
 			float actuall = cost.value(t.index1, t.index2);
@@ -92,7 +96,7 @@ public abstract class GapCostTest {
 	}
 
 	@Test
-	public void testToString() {
+	public void implementsToString() {
 		assertFalse(
 				"@ indicates toString() was not implemented " + cost.toString(),
 				cost.toString().contains("@"));

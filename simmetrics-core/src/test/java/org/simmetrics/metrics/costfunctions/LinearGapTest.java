@@ -19,28 +19,27 @@
  * You should have received a copy of the GNU General Public License along with
  * SimMetrics. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.simmetrics.tokenizers;
+package org.simmetrics.metrics.costfunctions;
 
-import org.simmetrics.tokenizers.Tokenizer;
+import org.simmetrics.metrics.functions.Gap;
+import org.simmetrics.metrics.functions.LinearGap;
 
-public class QGram3TokenizerTest extends TokenizerTest {
-
+@SuppressWarnings("javadoc")
+public final class LinearGapTest extends GapCostTest {
 	@Override
-	protected Tokenizer getTokenizer() {
-		return new QGram(3);
+	public Gap getCost() {
+		return new LinearGap(-0.42f);
 	}
 
 	@Override
 	public T[] getTests() {
-
-		return new T[] {
-				new T(""),
-				new T("1", "1"),
-				new T("12", "12"),
-				new T("123", "123"),
-				new T("12345678", "123", "234", "345", "456", "567", "678"),
-				new T("123123", "123", "231", "312", "123"),
-
-		};
+		final String testString = "hello world AAAAAAA BBB ABCDEF this is a test";
+		return new T[] { new T(-2.1000f, testString, 0, 6),
+				new T(-0.0000f, testString, 3, 4),
+				new T(-1.2600f, testString, 13, 17),
+				new T(-0.8400f, testString, 19, 22),
+				new T(-2.1000f, testString, 23, 29),
+				new T(-0.0000f, testString, 5, 6), };
 	}
+
 }

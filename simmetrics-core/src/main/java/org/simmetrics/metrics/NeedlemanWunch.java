@@ -25,7 +25,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
-import static org.simmetrics.utils.Math.min3;
+import static org.simmetrics.utils.Math.min;
 
 import java.util.Objects;
 
@@ -88,16 +88,12 @@ public class NeedlemanWunch implements StringMetric {
 			return 1.0f;
 		}
 
-		if (a.isEmpty() || b.isEmpty()) {
-			return 0.0f;
-		}
-
 		float maxDistance = max(a.length(), b.length())
 				* max(substitution.max(), gapValue);
 		float minDistance = max(a.length(), b.length())
 				* min(substitution.min(), gapValue);
 
-		return ((-needlemanWunch(a, b) - minDistance) / (maxDistance - minDistance));
+		return (-needlemanWunch(a, b) - minDistance) / (maxDistance - minDistance);
 
 	}
 
@@ -106,11 +102,12 @@ public class NeedlemanWunch implements StringMetric {
 		if (Objects.equals(s, t)) {
 			return 0;
 		}
+
 		if (s.isEmpty()) {
-			return t.length();
+			return -gapValue * t.length();
 		}
 		if (t.isEmpty()) {
-			return s.length();
+			return -gapValue * s.length();
 		}
 
 		final float[] v0 = new float[t.length() + 1];
@@ -124,7 +121,7 @@ public class NeedlemanWunch implements StringMetric {
 			v1[0] = i;
 
 			for (int j = 1; j < v0.length; j++) {
-				v1[j] = min3(v0[j] - gapValue, v1[j - 1] - gapValue, v0[j - 1]
+				v1[j] = min(v0[j] - gapValue, v1[j - 1] - gapValue, v0[j - 1]
 						- substitution.compare(s, i - 1, t, j - 1));
 			}
 

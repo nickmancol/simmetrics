@@ -1,3 +1,24 @@
+/*
+ * SimMetrics - SimMetrics is a java library of Similarity or Distance Metrics,
+ * e.g. Levenshtein Distance, that provide float based similarity measures
+ * between String Data. All metrics return consistent measures rather than
+ * unbounded similarity scores.
+ * 
+ * Copyright (C) 2014 SimMetrics authors
+ * 
+ * This file is part of SimMetrics. This program is free software: you can
+ * redistribute it and/or modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * SimMetrics. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.simmetrics;
 
 import static org.simmetrics.StringMetricBuilder.with;
@@ -12,9 +33,11 @@ import org.simmetrics.StringMetric;
 import org.simmetrics.simplifiers.Simplifier;
 import org.simmetrics.tokenizers.Tokenizer;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 
 
+@SuppressWarnings("javadoc")
 public class StringMetricBuilderTest {
 
 	@Before
@@ -35,7 +58,8 @@ public class StringMetricBuilderTest {
 
 	@Mock
 	private Predicate<String> predicate;
-
+	@Mock
+	private Function<String,String> function;
 	@Test
 	public void testStringMetric01() {
 		with(stringMetric)
@@ -88,6 +112,32 @@ public class StringMetricBuilderTest {
 				.filter(predicate)
 				.build();
 	}
+	@Test
+	public void testListMetricWithTransform() {
+		with(listMetric)
+				.tokenize(tokenizer)
+				.transform(function)
+				.build();
+	}
+	
+	
+	@Test
+	public void testListMetricWithFilterAndTransform01() {
+		with(listMetric)
+				.tokenize(tokenizer)
+				.filter(predicate)
+				.transform(function)
+				.build();
+	}
+
+	@Test
+	public void testListMetricWithFilterAndTransform02() {
+		with(listMetric)
+				.tokenize(tokenizer)
+				.transform(function)
+				.filter(predicate)
+				.build();
+	}
 
 	@Test
 	public void testListMetricWithSimplifier01() {
@@ -105,6 +155,7 @@ public class StringMetricBuilderTest {
 				.tokenize(tokenizer)
 				.build();
 	}
+
 
 	@Test
 	public void testListMetricWithSimplifier01WithCache() {
@@ -161,6 +212,33 @@ public class StringMetricBuilderTest {
 	public void testSetMetricWithFilter() {
 		with(setMetric)
 				.tokenize(tokenizer)
+				.filter(predicate)
+				.build();
+	}
+	
+	@Test
+	public void testSetMetricWithTransform() {
+		with(setMetric)
+				.tokenize(tokenizer)
+				.transform(function)
+				.build();
+	}
+	
+	
+	@Test
+	public void testSetMetricWithFilterAndTransform01() {
+		with(setMetric)
+				.tokenize(tokenizer)
+				.filter(predicate)
+				.transform(function)
+				.build();
+	}
+
+	@Test
+	public void testSetMetricWithFilterAndTransform02() {
+		with(setMetric)
+				.tokenize(tokenizer)
+				.transform(function)
 				.filter(predicate)
 				.build();
 	}
