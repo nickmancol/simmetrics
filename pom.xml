@@ -3,11 +3,12 @@
 
 	<groupId>com.github.mpkorstanje</groupId>
 	<artifactId>simmetrics</artifactId>
-	<version>3.2.0</version>
+	<version>3.2.3</version>
 	<packaging>pom</packaging>
 
 	<name>SimMetrics</name>
-	<description>SimMetrics is a java library of Similarity or Distance Metrics, e.g. Levenshtein distance, Cosine similarity, that provide float based similarity measures between String data. All metrics return consistent measures rather than unbounded similarity scores.</description>
+	<inceptionYear>2014</inceptionYear>
+	<description>A Java library of similarity and distance metrics e.g. Levenshtein distance and Cosine similarity. All similarity metrics return normalized values rather than unbounded similarity scores. Distance metrics return non-negative unbounded scores.</description>
 	<url>https://github.com/mpkorstanje/simmetrics</url>
 
 	<modules>
@@ -17,9 +18,10 @@
 
 	<licenses>
 		<license>
-			<name>GNU General Public License (GPL)</name>
-			<url>http://www.gnu.org/licenses/gpl.txt</url>
+			<name>Apache 2</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
 			<distribution>repo</distribution>
+			<comments>A business-friendly OSS license</comments>
 		</license>
 	</licenses>
 
@@ -30,6 +32,16 @@
 			<url>https://github.com/mpkorstanje/</url>
 		</developer>
 	</developers>
+
+	<ciManagement>
+		<system>Travis CI</system>
+		<url>https://travis-ci.org/mpkorstanje/simmetrics</url>
+	</ciManagement>
+
+	<issueManagement>
+		<system>GitHub Issues</system>
+		<url>https://github.com/mpkorstanje/simmetrics/issues</url>
+	</issueManagement>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -69,9 +81,32 @@
 				</configuration>
 			</plugin>
 
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>1.8</version>
+				<configuration>
+					<verbose>false</verbose>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>update-file-header</goal>
+						</goals>
+						<phase>process-sources</phase>
+						<configuration>
+							<organizationName>Simmetrics Authors</organizationName>
+							<canUpdateLicense>true</canUpdateLicense>
+							<canUpdateCopyright>true</canUpdateCopyright>
+							<canUpdateDescription>true</canUpdateDescription>
+							<addJavaLicenseAfterPackage>false</addJavaLicenseAfterPackage>
+							<licenseName>apache_v2</licenseName>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
-
 
 	<profiles>
 		<!-- Runs the deployment to Nexus Central. Call with `mvn deploy -P release` 
@@ -165,10 +200,6 @@
 							<aggregate>true</aggregate>
 							<instrumentation>
 								<ignoreTrivial>true</ignoreTrivial>
-								<excludes>
-									<exclude>org/simmetrics/example/*.class</exclude>
-									<exclude>org/simmetrics/performance/*.class</exclude>
-								</excludes>
 							</instrumentation>
 						</configuration>
 					</plugin>
@@ -185,7 +216,6 @@
 		<profile>
 			<id>reports</id>
 			<activation />
-
 			<reporting>
 				<plugins>
 					<plugin>
@@ -213,8 +243,6 @@
 					</plugin>
 				</plugins>
 			</reporting>
-
 		</profile>
 	</profiles>
-
 </project>

@@ -1,62 +1,67 @@
 /*
- * SimMetrics - SimMetrics is a java library of Similarity or Distance Metrics,
- * e.g. Levenshtein Distance, that provide float based similarity measures
- * between String Data. All metrics return consistent measures rather than
- * unbounded similarity scores.
+ * #%L
+ * Simmetrics Core
+ * %%
+ * Copyright (C) 2014 - 2015 Simmetrics Authors
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  * 
- * Copyright (C) 2014 SimMetrics authors
+ *      http://www.apache.org/licenses/LICENSE-2.0
  * 
- * This file is part of SimMetrics. This program is free software: you can
- * redistribute it and/or modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- * 
- * You should have received a copy of the GNU General Public License along with
- * SimMetrics. If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
  */
+
 package org.simmetrics.metrics;
 
 import org.junit.Test;
+import org.junit.experimental.runners.Enclosed;
+import org.junit.runner.RunWith;
 import org.simmetrics.Metric;
 import org.simmetrics.StringDistance;
 import org.simmetrics.StringDistanceTest;
 import org.simmetrics.StringMetric;
 import org.simmetrics.StringMetricTest;
 
-@SuppressWarnings("javadoc")
+@SuppressWarnings({ "javadoc", "static-method" })
+@RunWith(Enclosed.class)
 public final class DamerauLevenshteinTest {
+	public static final class OutofBounds {
 
-	@SuppressWarnings("unused")
-	@Test(expected=IllegalArgumentException.class)
-	public void insertDeleteCostOnBound(){
-		new DamerauLevenshtein(0, 1, 1);
+		@SuppressWarnings("unused")
+		@Test(expected = IllegalArgumentException.class)
+		public void shouldThrowForDeleteCostOnBound() {
+			new DamerauLevenshtein(0, 1, 1);
+		}
+
+		@SuppressWarnings("unused")
+		@Test(expected = IllegalArgumentException.class)
+		public void shouldThrowForDeleteCostBelowBound() {
+			new DamerauLevenshtein(-1f, 1, 1);
+		}
+
+		@SuppressWarnings("unused")
+		@Test(expected = IllegalArgumentException.class)
+		public void shouldThrowForsubstituteCostBelowBound() {
+			new DamerauLevenshtein(1, -Float.MIN_VALUE, 1);
+		}
+
+		@SuppressWarnings("unused")
+		@Test(expected = IllegalArgumentException.class)
+		public void shouldThrowForTransposeCostBelowBound() {
+			new DamerauLevenshtein(1, 1, -Float.MIN_VALUE);
+		}
 	}
 
-	@SuppressWarnings("unused")
-	@Test(expected=IllegalArgumentException.class)
-	public void insertDeleteCostBelowBound(){
-		new DamerauLevenshtein(-1f, 1, 1);
-	}
-
-	@SuppressWarnings("unused")
-	@Test(expected=IllegalArgumentException.class)
-	public void substituteCostBelowBound(){
-		new DamerauLevenshtein(1, -Float.MIN_VALUE, 1);
-	}
-	@SuppressWarnings("unused")
-	@Test(expected=IllegalArgumentException.class)
-	public void transposeCostBelowBound(){
-		new DamerauLevenshtein(1, 1, -Float.MIN_VALUE);
-	}
-	
+	@RunWith(Enclosed.class)
 	public static final class DistanceString {
-		
-		
+
 		public static final class UnitCost extends StringDistanceTest {
 
 			@Override
@@ -136,6 +141,7 @@ public final class DamerauLevenshteinTest {
 		}
 	}
 
+	@RunWith(Enclosed.class)
 	public static final class MetricStringTest {
 
 		public static final class UnitCost extends StringMetricTest {
@@ -257,11 +263,6 @@ public final class DamerauLevenshteinTest {
 			}
 
 			@Override
-			protected boolean satisfiesSubadditivity() {
-				return false;
-			}
-
-			@Override
 			protected boolean satisfiesCoincidence() {
 				return false;
 			}
@@ -287,7 +288,7 @@ public final class DamerauLevenshteinTest {
 
 			@Override
 			protected Metric<String> getMetric() {
-				return new DamerauLevenshtein(1.0f, 0.1f, 1.0f);
+				return new DamerauLevenshtein(1.0f, 0.2f, 1.0f);
 			}
 
 			@Override
@@ -297,15 +298,21 @@ public final class DamerauLevenshteinTest {
 
 			@Override
 			protected T[] getStringTests() {
-				return new T[] { new T(0.9889f, "Subsitute", "Subsytute"),
-						new T(0.9667f, "Subsitute", "Sybsytyte"),
-						new T(0.9917f, "test string1", "test string2"),
+				return new T[] { new T(0.9778f, "Subsitute", "Subsytute"),
+						new T(0.9333f, "Subsitute", "Sybsytyte"),
+						new T(0.9833f, "test string1", "test string2"),
 						new T(0.3333f, "test", "test string2"),
 						new T(0.0000f, "", "test string2"),
-						new T(0.9800f, "aaa bbb ccc ddd", "aaa bbb ccc eee"),
-						new T(0.9571f, "aaa bbb", "aaa aaa"),
+						new T(0.9600f, "aaa bbb ccc ddd", "aaa bbb ccc eee"),
+						new T(0.9143f, "aaa bbb", "aaa aaa"),
 						new T(0.4286f, "aaa", "aaa aaa"),
-						new T(0.9857f, "a b c d", "a b c e"), };
+						new T(0.9714f, "a b c d", "a b c e"),
+						new T(0.9000f, "uxyw", "uyxw"),
+						new T(0.6000f, "uxaayw", "uyxw"),
+						new T(0.9714f, "uxxxxxxyyyyyyw", "uxxxxxyxyyyyyw"),
+						new T(0.8500f, "uxxxxxxaayyyyyyw", "uxxxxxyxyyyyyw"),
+						new T(0.9000f, "wxyu", "wyxu"),
+						new T(0.6000f, "wxaayu", "wyxu"), };
 			}
 		}
 
@@ -314,11 +321,6 @@ public final class DamerauLevenshteinTest {
 			@Override
 			protected Metric<String> getMetric() {
 				return new DamerauLevenshtein(1.0f, 1.0f, 0.0f);
-			}
-
-			@Override
-			protected boolean satisfiesSubadditivity() {
-				return false;
 			}
 
 			@Override

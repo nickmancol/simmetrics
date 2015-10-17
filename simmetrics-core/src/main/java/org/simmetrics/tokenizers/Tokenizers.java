@@ -1,3 +1,22 @@
+/*
+ * #%L
+ * Simmetrics Core
+ * %%
+ * Copyright (C) 2014 - 2015 Simmetrics Authors
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
 package org.simmetrics.tokenizers;
 
 import static com.google.common.base.Functions.compose;
@@ -7,26 +26,31 @@ import static com.google.common.base.Predicates.and;
 import static com.google.common.collect.Lists.asList;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
+import static java.util.Arrays.asList;
+import static java.util.Arrays.copyOfRange;
+import static java.util.Collections.emptyList;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
-import org.simmetrics.StringMetricBuilder;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 /**
- * Tokenizer composed of a tokenizer and one or more post processors. Either
- * more tokenizers, filters or transformations.
+ * Utilities for tokenizers. Construct simple tokenizers, chain multiple
+ * tokenizers into a single tokenizers or apply filters and transforms to
+ * tokens.
  * <p>
- * This class is immutable and thread-safe if its components are.
- * 
- * @see StringMetricBuilder
+ * All methods return immutable objects provided the arguments are also
+ * immutable.
  */
 public final class Tokenizers {
 
@@ -55,18 +79,30 @@ public final class Tokenizers {
 
 			}
 
+//			@Override
+//			Collection<String> tokenizeToFilteredMultiset(String input) {
+//				return Collections2.filter(
+//						tokenizer.tokenizeToTransformedMultiset(input), predicate);
+//			}
+			
 			@Override
 			Collection<String> tokenizeToFilteredSet(String input) {
 				return Collections2.filter(
 						tokenizer.tokenizeToTransformedSet(input), predicate);
 			}
-
+			
 			@Override
 			public List<String> tokenizeToList(String input) {
 				return newArrayList(Collections2.filter(
 						tokenizer.tokenizeToTransformedList(input), predicate));
 			}
 
+//			@Override
+//			public Multiset<String> tokenizeToMultiset(String input) {
+//				return HashMultiset.create(Collections2.filter(
+//						tokenizer.tokenizeToTransformedMultiset(input), predicate));
+//			}
+			
 			@Override
 			public Set<String> tokenizeToSet(String input) {
 				return newHashSet(Collections2.filter(
@@ -117,27 +153,41 @@ public final class Tokenizers {
 
 		}
 
+//		Collection<String> tokenizeToFilteredMultiset(String input) {
+//			return Collections2.filter(tokenizer.tokenizeToMultiset(input),
+//					predicate);
+//		}
+		
 		Collection<String> tokenizeToFilteredSet(String input) {
-			return Collections2.filter(tokenizer.tokenizeToSet(input),
+			return Sets.filter(tokenizer.tokenizeToSet(input),
 					predicate);
 		}
-
+		
 		@Override
 		public List<String> tokenizeToList(String input) {
 			return new ArrayList<>(Collections2.filter(
 					tokenizer.tokenizeToList(input), predicate));
 		}
 
+//		@Override
+//		public Multiset<String> tokenizeToMultiset(String input) {
+//			return HashMultiset.create(Multisets.filter(
+//					tokenizer.tokenizeToMultiset(input), predicate));
+//		}
+		
 		@Override
 		public Set<String> tokenizeToSet(String input) {
 			return new HashSet<>(Collections2.filter(
 					tokenizer.tokenizeToSet(input), predicate));
 		}
-
+		
+		
 		@Override
 		public final String toString() {
 			return Joiner.on(" -> ").join(tokenizer, predicate);
 		}
+
+
 
 	}
 
@@ -173,10 +223,34 @@ public final class Tokenizers {
 			return tokens;
 		}
 
+//		@Override
+//		public Multiset<String> tokenizeToMultiset(String input) {
+//
+//			// tokenizeToList is not reused here on purpose. Removing duplicate
+//			// words early means these don't have to be tokenized multiple
+//			// times. Increases performance.
+//
+//			Multiset<String> tokens = HashMultiset.create(input.length());
+//			tokens.add(input);
+//
+//			Multiset<String> newTokens =  HashMultiset.create(input.length());
+//			for (Tokenizer t : tokenizers) {
+//				for (String token : tokens) {
+//					newTokens.addAll(t.tokenizeToList(token));
+//				}
+//				Multiset<String> swap = tokens;
+//				tokens = newTokens;
+//				newTokens = swap;
+//				newTokens.clear();
+//			}
+//
+//			return tokens;
+//		}
+		
 		@Override
 		public Set<String> tokenizeToSet(final String input) {
 
-			// tokenizeToArray is not reused here on purpose. Removing duplicate
+			// tokenizeToList is not reused here on purpose. Removing duplicate
 			// words early means these don't have to be tokenized multiple
 			// times. Increases performance.
 
@@ -186,6 +260,8 @@ public final class Tokenizers {
 			Set<String> newTokens = new HashSet<>(input.length());
 			for (Tokenizer t : tokenizers) {
 				for (String token : tokens) {
+					// Do use to list here, avoid intermediate 
+					// adding of a list to to set to add it to newTokens
 					newTokens.addAll(t.tokenizeToList(token));
 				}
 				Set<String> swap = tokens;
@@ -197,9 +273,31 @@ public final class Tokenizers {
 			return tokens;
 		}
 
+
 		@Override
 		public String toString() {
 			return Joiner.on(" -> ").join(tokenizers);
+		}
+
+
+	}
+
+	private static final class SplitTokenizer extends AbstractTokenizer {
+
+		private final Pattern pattern;
+
+		public SplitTokenizer(Pattern pattern) {
+			this.pattern = pattern;
+		}
+
+		@Override
+		public List<String> tokenizeToList(final String input) {
+			return asList(pattern.split(input, -1));
+		}
+
+		@Override
+		public String toString() {
+			return "SplitTokenizer [" + pattern + "]";
 		}
 
 	}
@@ -227,18 +325,28 @@ public final class Tokenizers {
 						tokenizer.tokenizeToFilteredList(input), function));
 			}
 
+//			@Override
+//			public Multiset<String> tokenizeToMultiset(String input) {
+//				return HashMultiset.create(Collections2.transform(
+//						tokenizer.tokenizeToFilteredMultiset(input), function));
+//			}
 			@Override
 			public Set<String> tokenizeToSet(String input) {
 				return newHashSet(Collections2.transform(
 						tokenizer.tokenizeToFilteredSet(input), function));
 			}
-
 			@Override
 			Collection<String> tokenizeToTransformedList(String input) {
 				return Collections2.transform(
 						tokenizer.tokenizeToFilteredList(input), function);
 			}
 
+//			@Override
+//			Collection<String> tokenizeToTransformedMultiset(String input) {
+//				return Collections2.transform(
+//						tokenizer.tokenizeToFilteredMultiset(input), function);
+//			}
+			
 			@Override
 			Collection<String> tokenizeToTransformedSet(String input) {
 				return Collections2.transform(
@@ -290,26 +398,69 @@ public final class Tokenizers {
 					tokenizer.tokenizeToList(input), function));
 		}
 
+//		@Override
+//		public Multiset<String> tokenizeToMultiset(String input) {
+//			return HashMultiset.create(Collections2.transform(
+//					tokenizer.tokenizeToMultiset(input), function));
+//		}
+
 		@Override
 		public Set<String> tokenizeToSet(String input) {
 			return newHashSet(Collections2.transform(
 					tokenizer.tokenizeToSet(input), function));
 		}
-
+		
 		Collection<String> tokenizeToTransformedList(String input) {
-			return Collections2.transform(tokenizer.tokenizeToList(input),
+			return Lists.transform(tokenizer.tokenizeToList(input),
 					function);
 		}
 
+//		Collection<String> tokenizeToTransformedMultiset(String input) {
+//			return Collections2.transform(tokenizer.tokenizeToMultiset(input),
+//					function);
+//		}
+		
 		Collection<String> tokenizeToTransformedSet(String input) {
 			return Collections2.transform(tokenizer.tokenizeToSet(input),
 					function);
 		}
-
+		
 		@Override
 		public final String toString() {
 			return Joiner.on(" -> ").join(tokenizer, function);
 		}
+
+
+	}
+
+	private static final class Whitespace extends AbstractTokenizer {
+
+		private final Pattern pattern = Pattern.compile("\\s+");
+
+		Whitespace() {
+		}
+
+		@Override
+		public List<String> tokenizeToList(final String input) {
+			if (input.isEmpty()) {
+				return emptyList();
+			}
+
+			String[] tokens = pattern.split(input);
+
+			// Remove leading empty token if any
+			if (tokens.length > 0 && tokens[0].isEmpty()) {
+				tokens = copyOfRange(tokens, 1, tokens.length);
+			}
+
+			return asList(tokens);
+		}
+
+		@Override
+		public String toString() {
+			return "WhitespaceTokenizer";
+		}
+
 	}
 
 	/**
@@ -329,7 +480,6 @@ public final class Tokenizers {
 		return new RecursiveTokenizer(flatten(tokenizers));
 	}
 
-	
 	/**
 	 * Chains tokenizers together. The output of each tokenizer is tokenized by
 	 * the next. The tokenizers are applied in order.
@@ -352,6 +502,7 @@ public final class Tokenizers {
 
 		return chain(asList(tokenizer, tokenizers));
 	}
+
 	/**
 	 * Constructs a new filtering tokenizer. After tokenization, all tokens that
 	 * don't match a predicate are removed.
@@ -381,6 +532,9 @@ public final class Tokenizers {
 
 		for (Tokenizer s : simplifiers) {
 			if (s instanceof RecursiveTokenizer) {
+				// Tokenizers controls the creation of recursive tokenizers
+				// all recursive tokenizers are flat so we don't have
+				// to flatten recursively
 				final RecursiveTokenizer c = (RecursiveTokenizer) s;
 				flattend.addAll(c.getTokenizers());
 			} else {
@@ -389,6 +543,108 @@ public final class Tokenizers {
 		}
 
 		return flattend;
+	}
+
+	/**
+	 * Returns a tokenizer that splits a string into tokens around the pattern
+	 * as if calling {@code pattern.split(input,-1)}.
+	 * 
+	 * @param pattern
+	 *            to split the the string around
+	 * 
+	 * @return a pattern tokenizer
+	 */
+	public static Tokenizer pattern(Pattern pattern) {
+		return new SplitTokenizer(pattern);
+	}
+
+	/**
+	 * Returns a tokenizer that splits a string into tokens around the pattern
+	 * as if calling {@code Pattern.compile(regex).split(input,-1)}.
+	 * 
+	 * @param regex
+	 *            to split the the string around
+	 * 
+	 * @return a pattern tokenizer
+	 */
+	public static Tokenizer pattern(String regex) {
+		return pattern(Pattern.compile(regex));
+	}
+
+	/**
+	 * Returns a basic q-gram tokenizer for a variable q. The tokenizer will
+	 * return an empty list if the input is empty. A list with the original
+	 * input is returned for tokens shorter then q.
+	 * 
+	 * @param q
+	 *            size of the tokens
+	 * @return a q-gram tokenizer
+	 *
+	 */
+	@SuppressWarnings("deprecation")
+	public static Tokenizer qGram(int q) {
+		return new QGram(q);
+	}
+
+	/**
+	 * Returns a basic q-gram tokenizer for a variable q. The tokenizer will
+	 * return an empty list if the input is empty or shorter then q.
+	 * 
+	 * @param q
+	 *            size of the tokens
+	 * @return a q-gram tokenizer
+	 *
+	 */
+	@SuppressWarnings("deprecation")
+	public static Tokenizer qGramWithFilter(int q) {
+		return new QGram(q, true);
+	}
+
+	/**
+	 * Returns a basic q-gram tokenizer for a variable q.The input is padded
+	 * with q-1 special characters before being tokenized. Uses {@code #} as the
+	 * default padding.
+	 * 
+	 * @param q
+	 *            size of the tokens
+	 * @return a q-gram tokenizer
+	 */
+	@SuppressWarnings("deprecation")
+	public static Tokenizer qGramWithPadding(int q) {
+		return new QGramExtended(q);
+	}
+
+	/**
+	 * 
+	 * Returns a basic q-gram tokenizer for a variable Q.The Q-Gram is extended
+	 * beyond the length of the string with padding.
+	 * 
+	 * @param q
+	 *            size of the tokens
+	 * @param padding
+	 *            padding to padd start and end of string with
+	 * @return a q-gram tokenizer
+	 */
+	public static Tokenizer qGramWithPadding(int q, String padding) {
+		return qGramWithPadding(q, padding, padding);
+	}
+
+	/**
+	 * Returns a basic q-gram tokenizer for a variable Q.The Q-Gram is extended
+	 * beyond the length of the string with padding.
+	 * 
+	 * @param q
+	 *            size of the tokens
+	 * @param startPadding
+	 *            padding to padd startof string with
+	 * @param endPadding
+	 *            padding to padd end of string with
+	 * @return a q-gram tokenizer
+	 */
+	@SuppressWarnings("deprecation")
+	public static Tokenizer qGramWithPadding(int q, String startPadding,
+			String endPadding) {
+		return new QGramExtended(q, startPadding, endPadding);
 	}
 
 	/**
@@ -413,6 +669,19 @@ public final class Tokenizers {
 		}
 
 		return new TransformingTokenizer(tokenizer, function);
+	}
+
+	/**
+	 * Returns a tokenizer that splits a string into tokens around whitespace.
+	 * Does not return leading or trailing empty tokens.
+	 * <p>
+	 * To create tokenizer that returns leading and trailing empty tokens use
+	 * {@code Tokenizers.pattern("\\s+")}
+	 * 
+	 * @return a white space tokenizer
+	 */
+	public static Tokenizer whitespace() {
+		return new Whitespace();
 	}
 
 	private Tokenizers() {

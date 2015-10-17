@@ -1,23 +1,23 @@
 /*
- * SimMetrics - SimMetrics is a java library of Similarity or Distance Metrics,
- * e.g. Levenshtein Distance, that provide float based similarity measures
- * between String Data. All metrics return consistent measures rather than
- * unbounded similarity scores.
+ * #%L
+ * Simmetrics Core
+ * %%
+ * Copyright (C) 2014 - 2015 Simmetrics Authors
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  * 
- * Copyright (C) 2014 SimMetrics authors
+ *      http://www.apache.org/licenses/LICENSE-2.0
  * 
- * This file is part of SimMetrics. This program is free software: you can
- * redistribute it and/or modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along with
- * SimMetrics. If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
  */
+
 package org.simmetrics.utils;
 
 import org.junit.Test;
@@ -29,7 +29,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.mockito.Mockito.*;
 
-@SuppressWarnings("javadoc")
+@SuppressWarnings({ "javadoc", "deprecation" })
 public class CachingTokenizerTest extends TokenizerTest {
 
 	private Tokenizer innerTokenizer;
@@ -54,7 +54,7 @@ public class CachingTokenizerTest extends TokenizerTest {
 	}
 
 	@Override
-	public final T[] getTests() {
+	protected final T[] getTests() {
 
 		return new T[] { new T("ABC", "ABC")
 				, new T("CCC", "CCC"),
@@ -65,7 +65,7 @@ public class CachingTokenizerTest extends TokenizerTest {
 		};
 	}
 	@Test
-	public final void tokenizeToListUsesCache() {
+	public final void tokenizeToListShouldUseCache() {
 		for (T t : tests) {
 			tokenizer.tokenizeToList(t.string());
 		}
@@ -76,7 +76,7 @@ public class CachingTokenizerTest extends TokenizerTest {
 
 
 	@Test
-	public final void tokenizeToSetUsesCache() {
+	public final void tokenizeToSetShouldUseCache() {
 		for (T t : tests) {
 			tokenizer.tokenizeToSet(t.string());
 		}
@@ -84,4 +84,5 @@ public class CachingTokenizerTest extends TokenizerTest {
 		 verify(innerTokenizer, times(1)).tokenizeToSet("ABC");
 		 verify(innerTokenizer, times(2)).tokenizeToSet("CCC");
 	}
+	
 }

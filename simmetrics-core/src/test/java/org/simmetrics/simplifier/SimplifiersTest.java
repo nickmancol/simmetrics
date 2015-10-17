@@ -1,18 +1,42 @@
+/*
+ * #%L
+ * Simmetrics Core
+ * %%
+ * Copyright (C) 2014 - 2015 Simmetrics Authors
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
 package org.simmetrics.simplifier;
 
 import static junit.framework.Assert.assertSame;
 import static org.simmetrics.simplifiers.Simplifiers.chain;
+import static org.simmetrics.simplifiers.Simplifiers.removeNonWord;
+import static org.simmetrics.simplifiers.Simplifiers.replaceNonWord;
+import static org.simmetrics.simplifiers.Simplifiers.toLowerCase;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
 import org.junit.Test;
-import org.simmetrics.simplifiers.Case;
+import org.junit.experimental.runners.Enclosed;
+import org.junit.runner.RunWith;
 import org.simmetrics.simplifiers.Simplifier;
-import org.simmetrics.simplifiers.WordCharacters;
+import org.simmetrics.simplifiers.Simplifiers;
 
-@SuppressWarnings("javadoc")
+@SuppressWarnings({ "javadoc", "static-method" })
+@RunWith(Enclosed.class)
 public final class SimplifiersTest {
 
 	public static final class WithChainSimplifier extends SimplifierTest {
@@ -46,7 +70,7 @@ public final class SimplifiersTest {
 		}
 
 	}
-	
+
 	public static final class WithTwo extends SimplifierTest {
 
 		@Override
@@ -58,6 +82,96 @@ public final class SimplifiersTest {
 		protected T[] getTests() {
 			return new T[] { new T("a", "a Sheep Goat"),
 					new T("", " Sheep Goat") };
+		}
+
+	}
+
+	public static final class RemoveDiacritics extends SimplifierTest {
+
+		@Override
+		protected Simplifier getSimplifier() {
+			return Simplifiers.removeDiacritics();
+		}
+
+		@Override
+		protected T[] getTests() {
+			return new T[] {
+					new T("Chilpéric II son of Childeric II",
+							"Chilperic II son of Childeric II"),
+					new T("The 11th Hour", "The 11th Hour"), new T("", ""), };
+		}
+
+	}
+
+	public static final class ToUpperCase extends SimplifierTest {
+
+		@Override
+		protected Simplifier getSimplifier() {
+			return Simplifiers.toUpperCase();
+		}
+
+		@Override
+		protected T[] getTests() {
+			return new T[] { new T("A", "A"), new T("a", "A"), new T("", "") };
+		}
+
+	}
+
+	public static final class ToLowerCase extends SimplifierTest {
+
+		@Override
+		protected Simplifier getSimplifier() {
+			return Simplifiers.toLowerCase();
+		}
+
+		@Override
+		protected T[] getTests() {
+			return new T[] { new T("A", "a"), new T("a", "a"), new T("", "") };
+		}
+
+	}
+
+	public static final class ReplaceNonWordCharacters extends SimplifierTest {
+
+		@Override
+		protected Simplifier getSimplifier() {
+			return replaceNonWord();
+		}
+
+		@Override
+		protected T[] getTests() {
+			return new T[] { new T("##", "  "),
+					new T("The ##th Hour", "The   th Hour"), new T("", "") };
+		}
+
+	}
+
+	public static final class ReplaceRegex extends SimplifierTest {
+
+		@Override
+		protected Simplifier getSimplifier() {
+			return Simplifiers.replaceAll("[a-z]+", "@");
+		}
+
+		@Override
+		protected T[] getTests() {
+			return new T[] { new T("##", "##"),
+					new T("The ##th Hour", "T@ ##@ H@"), new T("", "") };
+		}
+
+	}
+
+	public static final class RemoveRegex extends SimplifierTest {
+
+		@Override
+		protected Simplifier getSimplifier() {
+			return Simplifiers.removeAll("[a-z]+");
+		}
+
+		@Override
+		protected T[] getTests() {
+			return new T[] { new T("##", "##"),
+					new T("The ##th Hour", "T ## H"), new T("", "") };
 		}
 
 	}
@@ -127,32 +241,34 @@ public final class SimplifiersTest {
 
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void chainWithListContainingNull() {
-		chain(Arrays.asList(new Case.Lower(), (Simplifier) null,
-				new WordCharacters()));
-	}
+	public static final class ShouldThrowFor  {
 
-	@Test(expected = IllegalArgumentException.class)
-	public void chainWithNull() {
-		chain((Simplifier) null);
-	}
+		@Test(expected = IllegalArgumentException.class)
+		public void chainWithListContainingNull() {
+			chain(Arrays.asList(toLowerCase(), (Simplifier) null,
+					removeNonWord()));
+		}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void chainWithNullInVarArg() {
-		chain(new Case.Lower(), null, new WordCharacters());
-	}
+		@Test(expected = IllegalArgumentException.class)
+		public void chainWithNull() {
+			chain((Simplifier) null);
+		}
 
-	@Test
-	public void chainWithSingle() {
-		Simplifier lower = new Case.Lower();
-		assertSame(lower, chain(lower));
-	}
+		@Test(expected = IllegalArgumentException.class)
+		public void chainWithNullInVarArg() {
+			chain(toLowerCase(), null, removeNonWord());
+		}
 
-	@Test
-	public void chainWithSingletonList() {
-		Simplifier lower = new Case.Lower();
-		assertSame(lower, chain(Collections.singletonList(lower)));
-	}
+		@Test
+		public void chainWithSingle() {
+			Simplifier lower = toLowerCase();
+			assertSame(lower, chain(lower));
+		}
 
+		@Test
+		public void chainWithSingletonList() {
+			Simplifier lower = toLowerCase();
+			assertSame(lower, chain(Collections.singletonList(lower)));
+		}
+	}
 }
