@@ -2,7 +2,7 @@
  * #%L
  * Simmetrics Core
  * %%
- * Copyright (C) 2014 - 2015 Simmetrics Authors
+ * Copyright (C) 2014 - 2016 Simmetrics Authors
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ package org.simmetrics.metrics;
 
 import org.simmetrics.StringMetric;
 import org.simmetrics.StringMetricTest;
-import org.simmetrics.metrics.SmithWaterman;
 
 
 @SuppressWarnings("javadoc")
@@ -45,7 +44,7 @@ public class SmithWatermanTest extends StringMetricTest {
 
 	
 	@Override
-	protected T[] getStringTests()  {
+	protected T[] getTests()  {
 		return new T[] {
 				new T(0.0000f, "", "eee"),
 				new T(0.0000f, "aaa", "eee"),

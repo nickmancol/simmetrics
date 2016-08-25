@@ -2,7 +2,7 @@
  * #%L
  * Simmetrics Core
  * %%
- * Copyright (C) 2014 - 2015 Simmetrics Authors
+ * Copyright (C) 2014 - 2016 Simmetrics Authors
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,21 +19,23 @@
  */
 package org.simmetrics.metrics;
 
-import static java.util.Collections.frequency;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.simmetrics.ListDistance;
-import org.simmetrics.ListMetric;
-
 import static java.lang.Math.abs;
+import static org.simmetrics.metrics.Math.union;
+
+import org.simmetrics.MultisetDistance;
+import org.simmetrics.MultisetMetric;
+
+import com.google.common.collect.Multiset;
 
 /**
- * Block distance algorithm whereby vector space block distance between tokens
- * is used to determine a similarity. Also known as L1 Distance or City block
- * distance.
+ * Calculates the block distance and similarity over two multisets. Also known
+ * as L1 Distance or City block distance.
+ * <p>
+ * <code>
+ * similarity(a,b) = 1 - distance(a,b) / (∣a∣ + ∣b∣)
+ * <br>
+ * distance(a,b) = ∣∣a - b∣∣₁
+ * </code>
  * <p>
  * This class is immutable and thread-safe.
  * 
@@ -42,10 +44,10 @@ import static java.lang.Math.abs;
  * @param <T>
  *            type of token
  */
-public class BlockDistance<T> implements ListMetric<T>, ListDistance<T> {
+public final class BlockDistance<T> implements MultisetMetric<T>, MultisetDistance<T> {
 
 	@Override
-	public float compare(List<T> a, List<T> b) {
+	public float compare(Multiset<T> a, Multiset<T> b) {
 
 		if (a.isEmpty() && b.isEmpty()) {
 			return 1.0f;
@@ -59,19 +61,17 @@ public class BlockDistance<T> implements ListMetric<T>, ListDistance<T> {
 	}
 
 	@Override
-	public float distance(final List<T> a, final List<T> b) {
-		final Set<T> all = new HashSet<>(a.size() + b.size());
-		all.addAll(a);
-		all.addAll(b);
+	public float distance(Multiset<T> a, Multiset<T> b) {
 
-		int totalDistance = 0;
-		for (T token : all) {
-			int frequencyInA = frequency(a, token);
-			int frequencyInB = frequency(b, token);
+		float distance = 0;
 
-			totalDistance += abs(frequencyInA - frequencyInB);
+		for (T token : union(a, b).elementSet()) {
+			float frequencyInA = a.count(token);
+			float frequencyInB = b.count(token);
+
+			distance += abs(frequencyInA - frequencyInB);
 		}
-		return totalDistance;
+		return distance;
 	}
 
 	@Override

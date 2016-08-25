@@ -2,7 +2,7 @@
  * #%L
  * Simmetrics Core
  * %%
- * Copyright (C) 2014 - 2015 Simmetrics Authors
+ * Copyright (C) 2014 - 2016 Simmetrics Authors
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,15 @@ package org.simmetrics.tokenizers;
 
 import java.util.List;
 import java.util.Set;
+
+import com.google.common.collect.Multiset;
+
 /**
  * A tokenizer divides an input string into tokens. A tokenizer may not provide
- * {@code null} as a token.
+ * a collection containing null.
+ * <p>
+ * It is recommend that implementations extend {@link AbstractTokenizer}
+ * rather then implement this interface.
  */
 public interface Tokenizer {
 
@@ -39,14 +45,14 @@ public interface Tokenizer {
 	 */
 	public List<String> tokenizeToList(String input);
 
-//	/**
-//	 * Return tokenized version of a string as a multiset of tokens.
-//	 *
-//	 * @param input
-//	 *            input string to tokenize
-//	 * @return tokenized version of a string as a multiset
-//	 */
-//	public Multiset<String> tokenizeToMultiset(String input);
+	/**
+	 * Return tokenized version of a string as a multiset of tokens.
+	 *
+	 * @param input
+	 *            input string to tokenize
+	 * @return tokenized version of a string as a multiset
+	 */
+	public Multiset<String> tokenizeToMultiset(String input);
 	
 	/**
 	 * Return tokenized version of a string as a set of tokens.

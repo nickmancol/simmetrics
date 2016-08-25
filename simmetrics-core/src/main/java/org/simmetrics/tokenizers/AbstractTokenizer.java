@@ -2,7 +2,7 @@
  * #%L
  * Simmetrics Core
  * %%
- * Copyright (C) 2014 - 2015 Simmetrics Authors
+ * Copyright (C) 2014 - 2016 Simmetrics Authors
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,12 @@ package org.simmetrics.tokenizers;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Multiset;
+
 /**
  * Convenience tokenizer. Provides default implementation to tokenize to set and
- * multi set.
- *
+ * multiset by calling {@link Tokenizer#tokenizeToList(String)}.
  */
 public abstract class AbstractTokenizer implements Tokenizer {
 
@@ -35,9 +37,9 @@ public abstract class AbstractTokenizer implements Tokenizer {
 		return new HashSet<>(tokenizeToList(input));
 	}
 
-//	@Override
-//	public Multiset<String> tokenizeToMultiset(final String input) {
-//		return HashMultiset.create(tokenizeToList(input));
-//	}
+	@Override
+	public Multiset<String> tokenizeToMultiset(final String input) {
+		return HashMultiset.create(tokenizeToList(input));
+	}
 
 }

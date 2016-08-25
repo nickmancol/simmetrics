@@ -2,7 +2,7 @@
  * #%L
  * Simmetrics Core
  * %%
- * Copyright (C) 2014 - 2015 Simmetrics Authors
+ * Copyright (C) 2014 - 2016 Simmetrics Authors
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +28,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * American Soundex algorithms, yielding greater accuracy in matching especially
  * Slavish and Yiddish surnames with similar pronunciation but differences in
  * spelling.
- * </p>
- * 
+ * <p>
  * This class is immutable and thread-safe.
  * 
  * @see org.apache.commons.codec.language.DaitchMokotoffSoundex
@@ -37,8 +36,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *      Wikipedia - Daitch-Mokotoff Soundex</a>
  * @see <a href="http://www.avotaynu.com/soundex.htm">Avotaynu - Soundexing and
  *      Genealogy</a>
+ *      
+ * @deprecated will be removed due to a lack of a good use case
  */
-public class DaitchMokotoffSoundex implements Simplifier {
+@Deprecated
+public final class DaitchMokotoffSoundex implements Simplifier {
 
 	private final org.apache.commons.codec.language.DaitchMokotoffSoundex simplifier;
 	/**

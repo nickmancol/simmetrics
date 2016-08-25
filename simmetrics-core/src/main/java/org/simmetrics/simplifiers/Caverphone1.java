@@ -2,7 +2,7 @@
  * #%L
  * Simmetrics Core
  * %%
- * Copyright (C) 2014 - 2015 Simmetrics Authors
+ * Copyright (C) 2014 - 2016 Simmetrics Authors
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,11 +23,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Encodes a string into a Caverphone 1.0 value.
- *
+ * <p>
  * This is an algorithm created by the Caversham Project at the University of
  * Otago. It implements the Caverphone 1.0 algorithm.
- * 
- * 
  * <p>
  * This class is immutable and thread-safe.
  * </p>
@@ -38,9 +36,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *      href="http://caversham.otago.ac.nz/files/working/ctp150804.pdf">Caverphone
  *      2.0 specification</a>
  * @see org.apache.commons.codec.language.Caverphone1
+ * 
+ * @deprecated will be removed due to a lack of a good use case
  *
  */
-public class Caverphone1 implements Simplifier {
+@Deprecated
+public final class Caverphone1 implements Simplifier {
 
 	private final org.apache.commons.codec.language.Caverphone1 simplifier = new org.apache.commons.codec.language.Caverphone1();
 

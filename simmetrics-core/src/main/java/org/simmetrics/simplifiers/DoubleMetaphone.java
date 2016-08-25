@@ -2,7 +2,7 @@
  * #%L
  * Simmetrics Core
  * %%
- * Copyright (C) 2014 - 2015 Simmetrics Authors
+ * Copyright (C) 2014 - 2016 Simmetrics Authors
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,12 +24,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Encodes a string into a double metaphone value. This Implementation is based
  * on the algorithm by <cite>Lawrence Philips</cite>.
- * 
+ * <p>
  * This class is immutable and thread-safe.
  * 
  * @see org.apache.commons.codec.language.DoubleMetaphone
+ * 
+ * @deprecated will be removed due to a lack of a good use case
  */
-public class DoubleMetaphone implements Simplifier {
+@Deprecated
+public final class DoubleMetaphone implements Simplifier {
 
 	private static final int DEFAULT_CODE_LENGTH = 4;
 	private static final boolean DEFAULT_USE_ALTERNATE = false;

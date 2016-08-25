@@ -2,7 +2,7 @@
  * #%L
  * Simmetrics Examples
  * %%
- * Copyright (C) 2014 - 2015 Simmetrics Authors
+ * Copyright (C) 2014 - 2016 Simmetrics Authors
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,19 +21,14 @@
 package org.simmetrics.example;
 
 import static com.google.common.base.Predicates.in;
-import static org.simmetrics.StringMetricBuilder.with;
+import static org.simmetrics.builders.StringMetricBuilder.with;
 
 import java.util.Set;
 
-import org.simmetrics.ListMetric;
-import org.simmetrics.SetMetric;
 import org.simmetrics.StringMetric;
-import org.simmetrics.StringMetricBuilder;
 import org.simmetrics.metrics.CosineSimilarity;
 import org.simmetrics.metrics.Levenshtein;
-import org.simmetrics.simplifiers.Simplifier;
 import org.simmetrics.simplifiers.Simplifiers;
-import org.simmetrics.tokenizers.Tokenizer;
 import org.simmetrics.tokenizers.Tokenizers;
 
 import com.google.common.base.Function;
@@ -41,17 +36,13 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
 
 /**
- * The {@link StringMetricBuilder} can be used to compose metrics.
- * 
- * A metric is used to measure the similarity between strings. Metrics can work
- * on strings, lists or sets tokens. To compare strings with a metric that works
- * on a collection of tokens a tokenizer is required.
- * 
+ * The string metric builder can be used to compose similarity metrics for
+ * strings.
  */
-@SuppressWarnings("javadoc")
 public final class StringMetricBuilderExample {
 
 	/**
@@ -78,13 +69,13 @@ public final class StringMetricBuilderExample {
 	 * 
 	 * Simplification increases the effectiveness of a metric by removing noise
 	 * and reducing the dimensionality of the problem. The process maps a a
-	 * complex string such as to a simpler format. This allows string from
-	 * different sources to be compared in the same form.
+	 * complex string to a simpler format. This allows string from different
+	 * sources to be compared in the same form.
 	 *
-	 * Simplification can be done by any class implementing the
-	 * {@link Simplifier} interface.
+	 * The Simplifiers utility class contains a collection of common, useful
+	 * simplifiers. For a custom simplifier you can implement the Simplifier
+	 * interface.
 	 */
-
 	public static float example01() {
 
 		String a = "Chilpéric II son of Childeric II";
@@ -118,14 +109,11 @@ public final class StringMetricBuilderExample {
 	/**
 	 * Tokenization
 	 * 
-	 * Tokenization cuts up a string into tokens. Tokenization can also be done
-	 * repeatedly by tokenizing the individual tokens.
-	 * 
-	 * The method of tokenization changes the space in which strings are
-	 * compared. The effectiveness depends on the context. A whitespace
-	 * tokenizer might be more useful to measure similarity between large bodies
-	 * of texts whiles a q-gram tokenizer will work more effectively for
-	 * matching words.
+	 * A metric can be used to measure the similarity between strings. However
+	 * not all metrics can operate on strings directly. Some operate on lists,
+	 * sets or multisets. To compare strings with a metric that works on a
+	 * collection a tokenizer is required. Tokenization cuts up a string into
+	 * parts.
 	 * 
 	 * Example:
 	 * 
@@ -135,10 +123,15 @@ public final class StringMetricBuilderExample {
 	 * 
 	 * `[chilperic, ii, son, of, childeric, ii]`
 	 * 
-	 * Tokenization can be done by any class implementing the {@link Tokenizer}
-	 * interface and is required for all metrics that work on collections of
-	 * tokens rather then whole strings; {@link ListMetric}s and
-	 * {@link SetMetric}s
+	 * The choice of the tokenizer can influence the effectiveness of a metric.
+	 * For example when comparing individual words a q-gram tokenizer will be
+	 * more effective while a whitespace tokenizer will be more effective when
+	 * comparing documents.
+	 * 
+	 * The Tokenizers utility class contains a collection of common, useful
+	 * tokenizers. For a custom tokenizer you can implement the Tokenizer
+	 * interface. Though it is recommended that you extend the
+	 * AbstractTokenizer.
 	 */
 	public static float example03() {
 
@@ -179,13 +172,13 @@ public final class StringMetricBuilderExample {
 				.tokenize(Tokenizers.qGram(3))
 				.build();
 
-		return metric.compare(a, b); // 0.8131
+		return metric.compare(a, b); // 0.8292
 	}
 
 	/**
 	 * Tokens can be filtered to avoid comparing strings on common but otherwise
 	 * low information words. Tokens can be filtered after any tokenization step
-	 * and can be applied repeatedly.
+	 * and filters can be applied repeatedly.
 	 * 
 	 * A filter can be implemented by implementing a the {@link Predicate}
 	 * interface. By chaining predicates more complicated filters can be build.
@@ -204,17 +197,18 @@ public final class StringMetricBuilderExample {
 				.tokenize(Tokenizers.whitespace())
 				.filter(Predicates.not(in(commonWords)))
 				.filter(Predicates.not(in(otherCommonWords)))
-				.tokenize(Tokenizers.qGram(3)).build();
+				.tokenize(Tokenizers.qGram(3))
+				.build();
 
-		return metric.compare(a, b); // 0.68061393
+		return metric.compare(a, b); // 0.6902
 	}
 
 	/**
 	 * Tokens can be transformed to a simpler form. This may be used to reduce
 	 * the possible token space. Tokens can be transformed after any
-	 * tokenization step and can be applied repeatedly.
+	 * tokenization step and the transformation can be applied repeatedly.
 	 * 
-	 * A transformation can be implemented by implementing a the {@link Function}
+	 * A transformation can be implemented by implementing a the Function
 	 * interface.
 	 */
 	public static float example06() {
@@ -240,7 +234,7 @@ public final class StringMetricBuilderExample {
 				.tokenize(Tokenizers.qGram(3))
 				.build();
 
-		return metric.compare(a, b); // 0.68061393
+		return metric.compare(a, b); // 0.6902
 	}
 
 	/**
@@ -254,13 +248,13 @@ public final class StringMetricBuilderExample {
 		String a = "A quirky thing it is. This is a sentence.";
 		String b = "This sentence is similar; a quirky thing it is.";
 
-		Cache<String,String> stringCache = CacheBuilder
-				.newBuilder()
+		Cache<String,String> stringCache = 
+				CacheBuilder.newBuilder()
 				.maximumSize(2)
 				.build();
 		
-		Cache<String,Set<String>> tokenCache = CacheBuilder
-				.newBuilder()
+		Cache<String,Multiset<String>> tokenCache = 
+				CacheBuilder.newBuilder()
 				.maximumSize(2)
 				.build();	
 		
@@ -273,7 +267,7 @@ public final class StringMetricBuilderExample {
 				.cacheTokens(tokenCache)
 				.build();
 
-		return metric.compare(a, b); // 0.8131
+		return metric.compare(a, b); // 0.6902
 	}
 
 }

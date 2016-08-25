@@ -2,7 +2,7 @@
  * #%L
  * Simmetrics Core
  * %%
- * Copyright (C) 2014 - 2015 Simmetrics Authors
+ * Copyright (C) 2014 - 2016 Simmetrics Authors
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,13 +27,15 @@ import static org.apache.commons.codec.language.Soundex.US_ENGLISH;
  * Encodes a string into a Soundex value. Soundex is an encoding used to relate
  * similar names, but can also be used as a general purpose scheme to find word
  * with similar phonemes.
- *
+ * <p>
  * This class is thread-safe and immutable.
  * 
  * @see org.apache.commons.codec.language.Soundex
- *
+ * 
+ * @deprecated will be removed due to a lack of a good use case
  */
-public class Soundex implements Simplifier {
+@Deprecated
+public final class Soundex implements Simplifier {
 
 	@Override
 	public String toString() {

@@ -2,7 +2,7 @@
  * #%L
  * Simmetrics Core
  * %%
- * Copyright (C) 2014 - 2015 Simmetrics Authors
+ * Copyright (C) 2014 - 2016 Simmetrics Authors
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,9 @@ package org.simmetrics;
 
 
 /**
- * Measures the unnormalized similarity (distance) between two arbitrary objects
- * of the same type . The measurement results in a non-negative value. A value
- * of zero indicates that the objects are similar.
+ * Measures the unnormalized dissimilarity between two arbitrary objects of the
+ * same type. The measurement results in a non-negative value. A value of zero
+ * indicates that the objects are similar.
  * <p>
  * The distance measure should be consistent with equals such that
  * {@code a.equals(b) => distance(a,b) == 0.0}.

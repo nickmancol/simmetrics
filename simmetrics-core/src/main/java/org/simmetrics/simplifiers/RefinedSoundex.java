@@ -2,7 +2,7 @@
  * #%L
  * Simmetrics Core
  * %%
- * Copyright (C) 2014 - 2015 Simmetrics Authors
+ * Copyright (C) 2014 - 2016 Simmetrics Authors
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,15 +25,16 @@ import static org.apache.commons.codec.language.RefinedSoundex.US_ENGLISH;
 /**
  * Encodes a string into a Refined Soundex value. A refined soundex code is
  * optimized for spell checking words. Soundex method originally developed by
- * <CITE>Margaret Odell</CITE> and <CITE>Robert Russell</CITE>.
- *
+ * <cite>Margaret Odell</cite> and <cite>Robert Russell</cite>.
  * <p>
  * This class is immutable and thread-safe.
- * </p>
  *
  * @see org.apache.commons.codec.language.RefinedSoundex
+ * 
+ * @deprecated will be removed due to a lack of a good use case
  */
-public class RefinedSoundex implements Simplifier {
+@Deprecated
+public final class RefinedSoundex implements Simplifier {
 
 	@Override
 	public String simplify(String input) {

@@ -2,7 +2,7 @@
  * #%L
  * Simmetrics Core
  * %%
- * Copyright (C) 2014 - 2015 Simmetrics Authors
+ * Copyright (C) 2014 - 2016 Simmetrics Authors
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,12 +24,11 @@ import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.simmetrics.StringMetric;
 import org.simmetrics.StringMetricTest;
-import org.simmetrics.metrics.NeedlemanWunch;
 import org.simmetrics.metrics.functions.MatchMismatch;
 
 @SuppressWarnings("javadoc")
 @RunWith(Enclosed.class)
-public final class NeedlemanWunchTest {
+public class NeedlemanWunchTest {
 
 	public static final class Default extends StringMetricTest {
 
@@ -40,7 +39,7 @@ public final class NeedlemanWunchTest {
 
 		
 		@Override
-		protected T[] getStringTests()  {
+		protected T[] getTests()  {
 			return new T[] {
 
 					new T(0.9583f, "test string1", "test string2"),
@@ -119,7 +118,7 @@ public final class NeedlemanWunchTest {
 
 		
 		@Override
-		protected T[] getStringTests()  {
+		protected T[] getTests()  {
 			return new T[] { new T(1.0000f, "test string1", "test string2"),
 					new T(1.0000f, "test", "test string2"),
 					new T(1.0000f, "", "test string2"),
@@ -155,7 +154,7 @@ public final class NeedlemanWunchTest {
 
 		
 		@Override
-		protected T[] getStringTests()  {
+		protected T[] getTests()  {
 			return new T[] {
 					new T(0.9833f, "test string1", "test string2"),
 					new T(0.9333f, "test", "test string2"),

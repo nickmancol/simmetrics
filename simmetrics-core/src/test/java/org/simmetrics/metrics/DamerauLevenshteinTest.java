@@ -2,7 +2,7 @@
  * #%L
  * Simmetrics Core
  * %%
- * Copyright (C) 2014 - 2015 Simmetrics Authors
+ * Copyright (C) 2014 - 2016 Simmetrics Authors
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,28 +31,24 @@ import org.simmetrics.StringMetricTest;
 
 @SuppressWarnings({ "javadoc", "static-method" })
 @RunWith(Enclosed.class)
-public final class DamerauLevenshteinTest {
+public class DamerauLevenshteinTest {
 	public static final class OutofBounds {
 
-		@SuppressWarnings("unused")
 		@Test(expected = IllegalArgumentException.class)
 		public void shouldThrowForDeleteCostOnBound() {
 			new DamerauLevenshtein(0, 1, 1);
 		}
 
-		@SuppressWarnings("unused")
 		@Test(expected = IllegalArgumentException.class)
 		public void shouldThrowForDeleteCostBelowBound() {
 			new DamerauLevenshtein(-1f, 1, 1);
 		}
 
-		@SuppressWarnings("unused")
 		@Test(expected = IllegalArgumentException.class)
 		public void shouldThrowForsubstituteCostBelowBound() {
 			new DamerauLevenshtein(1, -Float.MIN_VALUE, 1);
 		}
 
-		@SuppressWarnings("unused")
 		@Test(expected = IllegalArgumentException.class)
 		public void shouldThrowForTransposeCostBelowBound() {
 			new DamerauLevenshtein(1, 1, -Float.MIN_VALUE);
@@ -75,7 +71,7 @@ public final class DamerauLevenshteinTest {
 			}
 
 			@Override
-			protected T[] getStringTests() {
+			protected T[] getTests() {
 				return new T[] {
 
 						new T(1.0000f, "test string1", "test string2"),
@@ -157,7 +153,7 @@ public final class DamerauLevenshteinTest {
 			}
 
 			@Override
-			protected T[] getStringTests() {
+			protected T[] getTests() {
 				return new T[] {
 
 						new T(0.9166f, "test string1", "test string2"),
@@ -241,7 +237,7 @@ public final class DamerauLevenshteinTest {
 			}
 
 			@Override
-			protected T[] getStringTests() {
+			protected T[] getTests() {
 				return new T[] { new T(0.9500f, "InsertDelete", "Insert"),
 						new T(0.9500f, "InsertDelete", "Delete"),
 						new T(0.9500f, "DeleteInsert", "Insert"),
@@ -268,7 +264,7 @@ public final class DamerauLevenshteinTest {
 			}
 
 			@Override
-			protected T[] getStringTests() {
+			protected T[] getTests() {
 				return new T[] { new T(1.0000f, "Subsitute", "Subsytute"),
 						new T(1.0000f, "Subsitute", "Sybsytyte"),
 						new T(0.5000f, "abc", "abcdef"),
@@ -297,7 +293,7 @@ public final class DamerauLevenshteinTest {
 			}
 
 			@Override
-			protected T[] getStringTests() {
+			protected T[] getTests() {
 				return new T[] { new T(0.9778f, "Subsitute", "Subsytute"),
 						new T(0.9333f, "Subsitute", "Sybsytyte"),
 						new T(0.9833f, "test string1", "test string2"),
@@ -329,8 +325,10 @@ public final class DamerauLevenshteinTest {
 			}
 
 			@Override
-			protected T[] getStringTests() {
-				return new T[] { new T(1.000f, "uxyw", "uyxw"),
+			protected T[] getTests() {
+				return new T[] { 
+						new T(0.000f, "uxyw", ""),
+						new T(1.000f, "uxyw", "uyxw"),
 						new T(1.000f, "uxyvxyw", "uyxvyxw"),
 						new T(1.000f, "transpose", "tranpsose"),
 
@@ -355,8 +353,10 @@ public final class DamerauLevenshteinTest {
 			}
 
 			@Override
-			protected T[] getStringTests() {
-				return new T[] { new T(0.9750f, "uxyw", "uyxw"),
+			protected T[] getTests() {
+				return new T[] { 
+						new T(0.0000f, "uxyw", ""),
+						new T(0.9750f, "uxyw", "uyxw"),
 						new T(0.9714f, "uxyvxyw", "uyxvyxw"),
 						new T(0.9888f, "transpose", "tranpsose"),
 

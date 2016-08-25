@@ -2,7 +2,7 @@
  * #%L
  * Simmetrics Core
  * %%
- * Copyright (C) 2014 - 2015 Simmetrics Authors
+ * Copyright (C) 2014 - 2016 Simmetrics Authors
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,50 +20,51 @@
 
 package org.simmetrics.metrics;
 
-import static java.util.Collections.frequency;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.simmetrics.ListDistance;
-import org.simmetrics.ListMetric;
-
+import static org.simmetrics.metrics.Math.union;
 import static java.lang.Math.sqrt;
 
+import org.simmetrics.MultisetDistance;
+import org.simmetrics.MultisetMetric;
+
+import com.google.common.collect.Multiset;
+
 /**
- * Euclidean Distance algorithm providing a similarity measure between two lists
- * using the vector space of combined terms as the dimensions.
- *
+ * Calculates the Euclidean distance and similarity over two multisets.
+ * <p>
+ * <code>
+ * similarity(a,b) = 1 - distance(a,b) / √(∣a∣² + ∣b∣²)
+ * <br>
+ * distance(a,b) = ∣∣a - b∣∣  
+ * </code>
  * <p>
  * This class is immutable and thread-safe.
+ * 
+ * @see <a href="https://en.wikipedia.org/wiki/Euclidean_distance">Wikipedia - Euclidean Distance</a>
  * @param <T>
  *            type of the token
  * 
  */
-public class EuclideanDistance<T> implements ListMetric<T>, ListDistance<T> {
+public final class EuclideanDistance<T> implements MultisetMetric<T>, MultisetDistance<T> {
 
 	@Override
-	public float compare(List<T> a, List<T> b) {
+	public float compare(Multiset<T> a, Multiset<T> b) {
 
 		if (a.isEmpty() && b.isEmpty()) {
 			return 1.0f;
 		}
 
 		float maxDistance = (float) sqrt((a.size() * a.size()) + (b.size() * b.size()));
-		return (maxDistance - distance(a, b)) / maxDistance;
+		return 1.0f - distance(a, b) / maxDistance;
 	}
 
 	@Override
-	public float distance(final List<T> a, final List<T> b) {
-		final Set<T> all = new HashSet<>(a.size() + b.size());
-		all.addAll(a);
-		all.addAll(b);
+	public float distance(Multiset<T> a, Multiset<T> b) {
 
 		float distance = 0.0f;
-		for (final T token : all) {
-			int frequencyInA = frequency(a, token);
-			int frequencyInB = frequency(b, token);
+
+		for (T token : union(a, b).elementSet()) {
+			float frequencyInA = a.count(token);
+			float frequencyInB = b.count(token);
 
 			distance += ((frequencyInA - frequencyInB) * (frequencyInA - frequencyInB));
 		}

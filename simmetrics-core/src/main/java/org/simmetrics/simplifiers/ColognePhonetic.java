@@ -2,7 +2,7 @@
  * #%L
  * Simmetrics Core
  * %%
- * Copyright (C) 2014 - 2015 Simmetrics Authors
+ * Copyright (C) 2014 - 2016 Simmetrics Authors
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,19 +28,18 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * href="http://de.wikipedia.org/wiki/K%C3%B6lner_Phonetik">K&ouml;lner
  * Phonetik</a> (Cologne Phonetic) algorithm issued by Hans Joachim Postel in
  * 1969.
- * </p>
  * <p>
  * The <i>K&ouml;lner Phonetik</i> is a phonetic algorithm which is optimized
  * for the German language. It is related to the well-known soundex algorithm.
- * </p>
- * 
  * <p>
  * This class is immutable and thread-safe.
- * </p>
  * 
  * @see org.apache.commons.codec.language.ColognePhonetic
+ * 
+ * @deprecated will be removed due to a lack of a good use case
  */
-public class ColognePhonetic implements Simplifier {
+@Deprecated
+public final class ColognePhonetic implements Simplifier {
 
 	private final org.apache.commons.codec.language.ColognePhonetic simplifier = new org.apache.commons.codec.language.ColognePhonetic();
 

@@ -2,7 +2,7 @@
  * #%L
  * Simmetrics Core
  * %%
- * Copyright (C) 2014 - 2015 Simmetrics Authors
+ * Copyright (C) 2014 - 2016 Simmetrics Authors
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,9 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Measures the distance between two arbitrary lists containing elements of the
- * same type. The measurement results in a value between 0 and 1 inclusive. A
- * value of zero indicates that the lists are dissimilar, a value of 1 indicates
- * they are similar.
+ * Measures the unnormalized dissimilarity between two arbitrary lists
+ * containing elements of the same type. The measurement results in a
+ * non-negative value. A value of zero indicates that the objects are similar.
  * <p>
  * The elements in the lists have to implement {@link Object#hashCode()} and
  * {@link Object#equals(Object)}.
@@ -34,10 +33,10 @@ import java.util.List;
  * The distance measure should be consistent with equals such that
  * {@code a.equals(b) => distance(a,b) == 0.0}.
  * <p>
- * The similarity measure should be reflexive such that
+ * The distance measure should be reflexive such that
  * {@code distance(a,a) == 0.0}.
  * <p>
- * The similarity measure should be symmetric such that
+ * The distance measure should be symmetric such that
  * {@code distance(a,b) == distance(b,a)}.
  * <p>
  * Implementations may not modify the contents of the list. List should be

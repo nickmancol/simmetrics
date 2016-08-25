@@ -2,7 +2,7 @@
  * #%L
  * Simmetrics Core
  * %%
- * Copyright (C) 2014 - 2015 Simmetrics Authors
+ * Copyright (C) 2014 - 2016 Simmetrics Authors
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,14 @@
 
 package org.simmetrics.performance;
 
+import static java.lang.Math.floor;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+import static java.util.Arrays.copyOf;
+
 import org.simmetrics.Metric;
 import org.simmetrics.StringMetric;
 import org.simmetrics.metrics.Jaro;
-
-import static java.lang.Math.*;
-import static java.util.Arrays.copyOf;
 
 import com.google.caliper.Benchmark;
 import com.google.caliper.Param;

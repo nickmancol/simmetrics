@@ -2,7 +2,7 @@
  * #%L
  * Simmetrics Core
  * %%
- * Copyright (C) 2014 - 2015 Simmetrics Authors
+ * Copyright (C) 2014 - 2016 Simmetrics Authors
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,24 +19,19 @@
  */
 package org.simmetrics.simplifiers;
 
-import org.simmetrics.StringMetricBuilder;
+import org.simmetrics.builders.StringMetricBuilder;
 
 /**
  * Transforms a string into a simpler form.
- * 
  * <p>
  * Simplification increases the effectiveness of a metric by removing noise and
  * reducing the dimensionality of the problem. The process maps a a complex
  * string such as <code>Chilpéric II son of Childeric II</code> to a simpler
  * format <code>chilperic ii son of childeric ii</code>. This allows string from
  * different sources to be compared in the same normal form.
- * 
  * <p>
  * A simplifier can be added onto a metric through the
  * {@link StringMetricBuilder}.
- * 
- * 
- *
  */
 public interface Simplifier {
 

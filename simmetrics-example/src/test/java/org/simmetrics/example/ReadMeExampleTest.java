@@ -2,7 +2,7 @@
  * #%L
  * Simmetrics Examples
  * %%
- * Copyright (C) 2014 - 2015 Simmetrics Authors
+ * Copyright (C) 2014 - 2016 Simmetrics Authors
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,15 +27,25 @@ import org.junit.Test;
 public class ReadMeExampleTest {
 	
 	private static final float DELTA = 0.0001f;
-
-	@Test
-	public void example02(){
-		assertEquals(0.5590f, ReadMeExample.example02(), DELTA);
-	}
 	
 	@Test
 	public void example01(){
-		assertEquals(0.4472f, ReadMeExample.example01(), DELTA);
+		assertEquals(0.4767f, ReadMeExample.example01(), DELTA);
+	}
+	
+	@Test
+	public void example02(){
+		assertEquals(0.5720f, ReadMeExample.example02(), DELTA);
+	}
+	
+	@Test
+	public void example03(){
+		assertEquals(3.0000f, ReadMeExample.example03(), DELTA);
+	}
+
+	@Test
+	public void example04(){
+		assertEquals(0.4285f, ReadMeExample.example04(), DELTA);
 	}
 
 }

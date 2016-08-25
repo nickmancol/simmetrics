@@ -2,7 +2,7 @@
  * #%L
  * Simmetrics Core
  * %%
- * Copyright (C) 2014 - 2015 Simmetrics Authors
+ * Copyright (C) 2014 - 2016 Simmetrics Authors
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,13 @@
 
 package org.simmetrics.metrics.costfunctions;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.simmetrics.matchers.ImplementsToString.implementsToString;
+import static org.simmetrics.matchers.ToStringContainsSimpleClassName.toStringContainsSimpleClassName;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.simmetrics.metrics.functions.Substitution;
 
@@ -87,8 +90,6 @@ public abstract class SubstitutionTest {
 		}
 	}
 
-	@Test
-	@Ignore
 	public void generateTest() {
 		for (T t : getTests()) {
 			float actuall = cost.compare(t.string1, t.string1Index, t.string2,
@@ -101,12 +102,9 @@ public abstract class SubstitutionTest {
 	}
 
 	@Test
-	public void testToString() {
-		assertFalse(
-				"@ indicates toString() was not implemented " + cost.toString(),
-				cost.toString().contains("@"));
-
-		assertToStringContains(cost, cost.getClass().getSimpleName());
+	public final void shouldImplementToString() {
+		assertThat(cost, implementsToString());
+		assertThat(cost, toStringContainsSimpleClassName());
 	}
 
 	protected static void assertToStringContains(Substitution metric,

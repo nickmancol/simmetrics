@@ -2,7 +2,7 @@
  * #%L
  * Simmetrics Core
  * %%
- * Copyright (C) 2014 - 2015 Simmetrics Authors
+ * Copyright (C) 2014 - 2016 Simmetrics Authors
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,10 @@ package org.simmetrics.metrics;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.simmetrics.Metric;
+import org.simmetrics.StringDistance;
+import org.simmetrics.StringDistanceTest;
 import org.simmetrics.StringMetric;
 import org.simmetrics.StringMetricTest;
-import org.simmetrics.metrics.Jaro;
 
 @SuppressWarnings("javadoc")
 @RunWith(Enclosed.class)
@@ -39,8 +40,10 @@ public final class JaroTest {
 		}
 
 		@Override
-		protected T[] getStringTests() {
-			return new T[] { new T(0.9047f, "He0ll0o", "Hel00lo"),
+		protected T[] getTests() {
+			return new T[] { 
+					new T(0.0000f, "\0\0\0\0", ""),
+					new T(0.9047f, "He0ll0o", "Hel00lo"),
 					new T(0.9047f, "He\0ll\0o", "Hel\0\0lo"),
 					new T(0.8888f, "0000", "000000"),
 					new T(0.8888f, "\0\0\0\0", "\0\0\0\0\0\0"), 
@@ -71,12 +74,14 @@ public final class JaroTest {
 		}
 
 		@Override
-		protected T[] getStringTests() {
+		protected T[] getTests() {
 			return new T[] { new T(0.9444f, "MARTHA", "MARHTA"),
 					new T(0.8222f, "DWAYNE", "DUANE"),
 					new T(0.7666f, "DIXON", "DICKSONX"),
 					//Not from Wikipedia, proves triangle inequality doesn't hold
 					new T(0.5999f, "OZYMANDIAS", "MARCUS") ,
+					// Not from Wikipedia, mandatory empty vs non-empty test
+					new T(0.0000f, "OZYMANDIAS", "") ,
 
 			};
 		}
@@ -102,7 +107,7 @@ public final class JaroTest {
 		}
 
 		@Override
-		protected T[] getStringTests() {
+		protected T[] getTests() {
 			return new T[] {
 					new T(0.9444f, "test string1", "test string2"),
 					new T(0.0000f, "test string1", "Sold"),
@@ -160,6 +165,37 @@ public final class JaroTest {
 							"Structural Assessment: The Role of Large and Full-Scale Testing"),
 					new T(0.4931f, "Web Aplications",
 							"How to Find a Scholarship Online"), };
+		}
+	}
+	
+public static final class DistanceTest extends StringDistanceTest {
+		
+		@Override
+		protected boolean satisfiesSubadditivity() {
+			return false;
+		}
+		
+		@Override
+		protected StringDistance getMetric() {
+			return new Jaro();
+		}
+
+		
+		@Override
+		protected T[] getTests()  {
+			return new T[] {
+					new T(0.0556f, "test string1", "test string2"),
+					new T(0.2222f, "test", "test string2"),
+					new T(1.0000f, "", "test string2"),
+					new T(0.1333f, "aaa bbb ccc ddd", "aaa bbb ccc eee"),
+					new T(0.0952f, "a b c d", "a b c e"),
+					new T(0.1111f, "Healed", "Sealed"),
+					new T(0.2540f, "Healed", "Healthy"),
+					new T(0.1778f, "Healed", "Heard"),
+					new T(0.3056f, "Healed", "Herded"),
+					new T(0.2500f, "Healed", "Help"),
+					new T(0.3889f, "Healed", "Sold"),
+					new T(0.2500f, "Healed", "Help"), };
 		}
 	}
 }

@@ -2,7 +2,7 @@
  * #%L
  * Simmetrics Core
  * %%
- * Copyright (C) 2014 - 2015 Simmetrics Authors
+ * Copyright (C) 2014 - 2016 Simmetrics Authors
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,11 @@
 package org.simmetrics.tokenizers;
 
 import static java.util.Arrays.asList;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+import static org.simmetrics.matchers.ImplementsToString.implementsToString;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -32,11 +36,18 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.simmetrics.tokenizers.Tokenizer;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Multiset;
 
 @SuppressWarnings("javadoc")
 public abstract class TokenizerTest {
 
+	@Rule
+	public final MockitoRule mockitoRule = MockitoJUnit.rule();
+	
 	@Rule
 	public final ExpectedException thrown = ExpectedException.none();
 
@@ -61,12 +72,15 @@ public abstract class TokenizerTest {
 			return new HashSet<>(tokensAsList());
 		}
 
+		public Multiset<String> tokensAsMultiset() {
+			return HashMultiset.create(tokensAsList());
+		}
+
 	}
 
 	private static void testTokens(String string, Collection<String> expected,
 			Collection<String> actual) {
-		assertEquals(string + " did not tokenize to " + expected + " but "
-				+ actual, expected, actual);
+		assertEquals(string + " did not tokenize correctly", expected, actual);
 		assertFalse(actual + " contained null", actual.contains(null));
 	}
 
@@ -81,6 +95,9 @@ public abstract class TokenizerTest {
 	}
 
 	protected boolean supportsTokenizeToSet() {
+		return true;
+	}
+	protected boolean supportsTokenizeToMultiset() {
 		return true;
 	}
 
@@ -104,14 +121,8 @@ public abstract class TokenizerTest {
 	}
 
 	@Test
-	public final void implementsToString() {
-
-		String metricToString = tokenizer.toString();
-		String defaultToString = tokenizer.getClass().getName() + "@"
-				+ Integer.toHexString(tokenizer.hashCode());
-
-		assertFalse("toString() was not implemented " + tokenizer.toString(),
-				defaultToString.equals(metricToString));
+	public final void shouldImplementToString() {
+		assertThat(tokenizer, implementsToString());
 	}
 
 	@Test
@@ -125,7 +136,7 @@ public abstract class TokenizerTest {
 					tokenizer.tokenizeToList(t.string()));
 		}
 	}
-
+	
 	@Test
 	public final void tokenizeToListShouldThrowNullPointerException() {
 		if (supportsTokenizeToList()) {
@@ -158,5 +169,28 @@ public abstract class TokenizerTest {
 		}
 		tokenizer.tokenizeToSet(null);
 	}
+	
+	
+	@Test
+	public final void shouldTokenizeToMutiset() {
+		if (!supportsTokenizeToMultiset()) {
+			thrown.expect(UnsupportedOperationException.class);
+		}
 
+		for (T t : tests) {
+			testTokens(t.string(), t.tokensAsMultiset(),
+					tokenizer.tokenizeToMultiset(t.string()));
+		}
+	}
+	
+	@Test
+	public final void tokenizeToMultisetShouldThrowNullPointerException() {
+		if (supportsTokenizeToMultiset()) {
+			thrown.expect(NullPointerException.class);
+		} else {
+			thrown.expect(UnsupportedOperationException.class);
+		}
+		tokenizer.tokenizeToMultiset(null);
+	}
+	
 }
